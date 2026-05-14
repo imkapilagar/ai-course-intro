@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>AI Course — Intro Deck</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-card: #14141c;
+    --ink: #f5f5f7;
+    --muted: #8a8a99;
+    --accent: #a78bfa;     /* electric purple */
+    --accent-2: #22d3ee;   /* cyan */
+    --danger: #ef4444;
+    --good: #22c55e;
+    --line: #2a2a36;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "SF Pro Display", "Segoe UI", Inter, system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 5vh 6vw;
+    background: radial-gradient(ellipse at top left, #1a1a2e 0%, #0a0a0f 60%);
+    animation: fade 0.4s ease;
+  }
+  .slide.active { display: flex; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* --- typography --- */
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: clamp(40px, 5.2vw, 84px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-size: clamp(28px, 3vw, 48px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 2.5vh;
+  }
+  h3 { font-size: clamp(20px, 1.8vw, 28px); font-weight: 600; }
+  p, li { font-size: clamp(16px, 1.4vw, 22px); line-height: 1.55; color: var(--ink); }
+  .muted { color: var(--muted); }
+  .accent { color: var(--accent); }
+  .accent2 { color: var(--accent-2); }
+  .danger { color: var(--danger); }
+  .good { color: var(--good); }
+  .quote-attrib { font-size: clamp(18px, 1.4vw, 24px); color: var(--muted); margin-top: 2vh; font-style: italic; }
+
+  /* --- nav / page number --- */
+  .pagenum {
+    position: fixed;
+    bottom: 2vh;
+    right: 2vw;
+    color: var(--muted);
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    z-index: 10;
+  }
+  .hint {
+    position: fixed;
+    bottom: 2vh;
+    left: 2vw;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    z-index: 10;
+  }
+
+  /* --- slide 1 / 10 hero --- */
+  .hero {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #000;
+  }
+  .hero .bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+    z-index: 0;
+  }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%);
+    z-index: 1;
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 80vw; }
+  .hero h1 {
+    font-size: clamp(36px, 4.5vw, 72px);
+    line-height: 1.15;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.8);
+  }
+
+  /* --- timeline (slide 2) --- */
+  .timeline {
+    position: relative;
+    margin-top: 6vh;
+    padding: 6vh 0;
+  }
+  .timeline-line {
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent) 10%, var(--accent-2) 90%, transparent);
+  }
+  .milestones {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    position: relative;
+    z-index: 2;
+  }
+  .milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 0.5vw;
+  }
+  .milestone .dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 5px rgba(167,139,250,0.18), 0 0 25px var(--accent);
+    margin: 14px 0;
+  }
+  .milestone:nth-child(even) .dot { background: var(--accent-2); box-shadow: 0 0 0 5px rgba(34,211,238,0.18), 0 0 25px var(--accent-2); }
+  .milestone .date {
+    font-size: clamp(13px, 1vw, 16px);
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .milestone .title {
+    font-weight: 700;
+    font-size: clamp(15px, 1.15vw, 19px);
+    margin-top: 6px;
+    color: var(--ink);
+  }
+  .milestone .desc {
+    font-size: clamp(12px, 0.95vw, 15px);
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .milestone.top .info { order: -1; margin-bottom: 14px; }
+  .milestone.bot .info { order: 1; margin-top: 14px; }
+
+  /* --- tables / data slides --- */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 3vh;
+  }
+  .data-table th, .data-table td {
+    text-align: left;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    font-size: clamp(15px, 1.2vw, 19px);
+  }
+  .data-table th {
+    color: var(--muted);
+    font-size: clamp(12px, 0.9vw, 14px);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .data-table td.red { color: var(--danger); font-weight: 700; }
+  .data-table td.green { color: var(--good); font-weight: 700; }
+
+  /* --- big red stat boxes --- */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2vw;
+    margin-top: 4vh;
+  }
+  .stat-card {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 14px;
+    padding: 3vh 2vw;
+    text-align: center;
+  }
+  .stat-card.good { background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.35); }
+  .stat-card .big {
+    font-family: Georgia, serif;
+    font-size: clamp(36px, 4.5vw, 64px);
+    font-weight: 700;
+    color: var(--danger);
+    line-height: 1;
+  }
+  .stat-card.good .big { color: var(--good); }
+  .stat-card .lbl {
+    margin-top: 12px;
+    color: var(--ink);
+    font-size: clamp(13px, 1.1vw, 17px);
+    line-height: 1.4;
+  }
+
+  /* --- two-column fork slide --- */
+  .fork {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3vw;
+    margin-top: 4vh;
+  }
+  .fork-col {
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 3vh 2vw;
+    border: 1px solid var(--line);
+  }
+  .fork-col.right { border-color: var(--accent); box-shadow: 0 0 40px rgba(167,139,250,0.15); }
+  .fork-col h3 { margin-bottom: 2vh; }
+  .fork-col.left h3 { color: var(--muted); }
+  .fork-col.right h3 { color: var(--accent); }
+  .fork-col ul { list-style: none; }
+  .fork-col li {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: clamp(14px, 1.1vw, 18px);
+  }
+  .fork-col li:last-child { border-bottom: none; }
+
+  /* --- quote slide --- */
+  .quote-slide {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .quote-slide blockquote {
+    font-family: Georgia, serif;
+    font-size: clamp(28px, 3.2vw, 52px);
+    line-height: 1.3;
+    max-width: 85vw;
+    font-style: italic;
+    color: var(--ink);
+  }
+  .quote-slide blockquote::before {
+    content: '“';
+    color: var(--accent);
+    font-size: 1.5em;
+    line-height: 0.5;
+    margin-right: 6px;
+  }
+  .receipts {
+    margin-top: 5vh;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+    text-align: left;
+    background: var(--bg-card);
+    padding: 3vh 3vw;
+    border-radius: 12px;
+    border-left: 3px solid var(--good);
+  }
+  .receipts .item { color: var(--ink); font-size: clamp(14px, 1.1vw, 18px); }
+  .receipts .item::before { content: '✓ '; color: var(--good); margin-right: 8px; }
+
+  /* --- promise list --- */
+  .promise {
+    margin-top: 4vh;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+  }
+  .promise .item {
+    display: flex;
+    gap: 2vw;
+    align-items: baseline;
+    padding: 18px 24px;
+    background: var(--bg-card);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+  }
+  .promise .num {
+    font-family: Georgia, serif;
+    font-size: clamp(24px, 2.4vw, 36px);
+    color: var(--accent);
+    font-weight: 700;
+    min-width: 50px;
+  }
+  .promise .txt { font-size: clamp(16px, 1.3vw, 21px); }
+
+  /* --- profiles for slide 7 --- */
+  .profiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2vw;
+    margin-top: 5vh;
+  }
+  .profile {
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 3vh 2vw;
+    border-top: 3px solid var(--accent-2);
+  }
+  .profile h3 {
+    color: var(--accent-2);
+    font-size: clamp(18px, 1.5vw, 24px);
+    margin-bottom: 12px;
+  }
+  .profile p { color: var(--muted); font-size: clamp(13px, 1.05vw, 17px); }
+
+  /* --- bottom line strip --- */
+  .bottom-line {
+    margin-top: auto;
+    padding-top: 4vh;
+    font-size: clamp(18px, 1.6vw, 26px);
+    color: var(--accent);
+    font-weight: 600;
+    font-style: italic;
+  }
+
+  /* --- demo slide --- */
+  .demo {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .demo .live-dot {
+    display: inline-block;
+    width: 16px; height: 16px;
+    background: var(--danger);
+    border-radius: 50%;
+    animation: blink 1.2s infinite;
+    margin-right: 14px;
+    box-shadow: 0 0 20px var(--danger);
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .demo h1 { color: var(--danger); }
+  .demo .sub { margin-top: 4vh; color: var(--muted); font-size: clamp(18px, 1.5vw, 26px); max-width: 70vw; }
+
+  /* Slide 5 quote attribution */
+  .attrib-block {
+    margin-top: 4vh;
+    font-size: clamp(18px, 1.5vw, 26px);
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ============ SLIDE 1 — HOOK (image only, no overlay) ============ -->
+  <section class="slide active" style="background:#fff; padding:0; display:none; align-items:center; justify-content:center;">
+    <img src="assets/Puck.png" alt="Wayne Gretzky quote"
+         style="width:100%; height:100%; object-fit:contain; background:#fff;" />
+  </section>
+
+  <!-- ============ SLIDE 2 — CLAUDE TIMELINE ============ -->
+  <section class="slide">
+    <h2>In 12 months, AI went from <span class="accent">assistant</span> to <span class="accent2">coworker</span>.</h2>
+
+    <div class="timeline">
+      <div class="timeline-line"></div>
+      <div class="milestones">
+        <div class="milestone top">
+          <div class="info">
+            <div class="date">SEP 2025</div>
+            <div class="title">Sonnet 4.5</div>
+            <div class="desc">30+ hours of autonomous coding</div>
+          </div>
+          <div class="dot"></div>
+        </div>
+        <div class="milestone bot">
+          <div class="dot"></div>
+          <div class="info">
+            <div class="date">NOV 2025</div>
+            <div class="title">Opus 4.5</div>
+            <div class="desc">Workplace automation</div>
+          </div>
+        </div>
+        <div class="milestone top">
+          <div class="info">
+            <div class="date">JAN 2026</div>
+            <div class="title">Claude Cowork</div>
+            <div class="desc">Enterprise applications</div>
+          </div>
+          <div class="dot"></div>
+        </div>
+        <div class="milestone bot">
+          <div class="dot"></div>
+          <div class="info">
+            <div class="date">FEB 2026</div>
+            <div class="title">Opus 4.6 + Agent Teams</div>
+            <div class="desc">1M context · multi-agent</div>
+          </div>
+        </div>
+        <div class="milestone top">
+          <div class="info">
+            <div class="date">FEB 2026</div>
+            <div class="title">COBOL Playbook</div>
+            <div class="desc">Legacy mainframe modernization</div>
+          </div>
+          <div class="dot"></div>
+        </div>
+        <div class="milestone bot">
+          <div class="dot"></div>
+          <div class="info">
+            <div class="date">APR 2026</div>
+            <div class="title">Opus 4.7</div>
+            <div class="desc">Self-verifying · vision · xhigh reasoning</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-line">
+      Five major capability jumps in one year. We are not on a normal technology curve.
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 3 — INDIAN IT COLLAPSE ============ -->
+  <section class="slide">
+    <h2>India's IT sector lost <span class="danger">a quarter of its value</span> while you were applying for placements.</h2>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Index / Stock</th>
+          <th>1-Year Return</th>
+          <th>YTD 2026</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><b>Nifty IT</b></td><td class="red">–19%</td><td class="red">–25.4% &nbsp;<span class="muted">(worst sector)</span></td></tr>
+        <tr><td><b>BSE IT</b></td><td class="red">–20%</td><td class="red">near 3-year low</td></tr>
+        <tr><td><b>Nifty 50</b> (broad market)</td><td class="muted">–1.44%</td><td class="muted">–9.7%</td></tr>
+        <tr><td>TCS</td><td class="red">–7.88%</td><td class="red">near 52-week low</td></tr>
+        <tr><td>Infosys</td><td class="red">sharp fall</td><td class="red">–22%</td></tr>
+        <tr><td>HCL Technologies</td><td class="green">+24.39%</td><td class="muted">(lone outperformer — AI services book)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="big">–25.4%</div><div class="lbl">Nifty IT YTD 2026</div></div>
+      <div class="stat-card"><div class="big">₹70,000 Cr</div><div class="lbl">TCS market cap erased in one quarter</div></div>
+      <div class="stat-card"><div class="big">₹54,000 Cr</div><div class="lbl">Infosys market cap erased in one quarter</div></div>
+    </div>
+
+    <div class="bottom-line">
+      "Infosys shares are down partly due to launch of new models from Gen-AI platforms like Claude…" &nbsp;— Indian financial press, May 2026
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 4 — US CARNAGE ============ -->
+  <section class="slide">
+    <h2>One Anthropic blog post wiped <span class="danger">$40 billion</span> off IBM.</h2>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Date</th><th>Event</th><th>Damage</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Feb 3, 2026</td>
+          <td>Claude Cowork launches</td>
+          <td class="red"><b>$285B</b> wiped off US software in one day</td>
+        </tr>
+        <tr>
+          <td>Feb 5, 2026</td>
+          <td>Opus 4.6 + Agent Teams</td>
+          <td class="red">"SaaSpocalypse" · Salesforce –25% YTD · SAP –18%</td>
+        </tr>
+        <tr>
+          <td>Feb 23, 2026</td>
+          <td>Claude Code COBOL Playbook</td>
+          <td class="red"><b>IBM –13%, ~$40B gone</b> (worst day since 2000)</td>
+        </tr>
+        <tr>
+          <td>Feb 23, 2026</td>
+          <td>Same day collateral</td>
+          <td class="red">Accenture –6.6% · Cognizant –6.0%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="stat-grid" style="margin-top: 5vh;">
+      <div class="stat-card good"><div class="big">$60B</div><div class="lbl">Anthropic valuation, Nov 2024</div></div>
+      <div class="stat-card good"><div class="big">$380B</div><div class="lbl">Series G, Feb 2026</div></div>
+      <div class="stat-card good"><div class="big">$900B</div><div class="lbl">Talks underway, May 2026</div></div>
+    </div>
+
+    <div class="bottom-line">
+      The "where the puck WAS" stocks lost over <b>$1 trillion</b> in market cap. The "where it's going" one is up 15×.
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 5 — DARIO ============ -->
+  <section class="slide quote-slide">
+    <blockquote>
+      In 3 to 6 months, AI will be writing 90% of code.<br/>
+      In 12 months, essentially all of it.<br/>
+      <span style="color: var(--accent);">I don't write any code anymore.</span>
+    </blockquote>
+    <div class="attrib-block">— Dario Amodei, CEO of Anthropic · March 2025</div>
+
+    <div style="margin-top: 4vh; padding: 3vh 3vw; background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.35); border-radius: 12px; max-width: 80vw; text-align: left;">
+      <div style="color: var(--accent); font-size: clamp(14px, 1vw, 16px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px;">The kicker</div>
+      <div style="font-family: Georgia, serif; font-style: italic; font-size: clamp(18px, 1.5vw, 26px); line-height: 1.5; color: var(--ink);">
+        "Our engineers hardly write code by themselves anymore. Their roles are more like product managers or architects — they put forward requirements, edit code the model generates, and control the overall architecture."
+      </div>
+      <div style="margin-top: 14px; color: var(--muted); font-size: clamp(13px, 1vw, 17px);">
+        The company <i>building</i> the AI doesn't have its engineers <i>writing</i> the code anymore.<br/>
+        If <span class="accent">Anthropic's own engineers</span> have stopped writing code by hand — what makes you think your job is safe?
+      </div>
+    </div>
+
+    <div class="receipts" style="margin-top: 3vh;">
+      <div class="item">Claude codes autonomously for 30 hours (Sonnet 4.5)</div>
+      <div class="item">Agent Teams ship in production (Opus 4.6)</div>
+      <div class="item">Indian IT loses ₹1.5 lakh Cr market cap</div>
+      <div class="item">Anthropic in talks at $900B valuation</div>
+    </div>
+
+    <div class="bottom-line" style="text-align:center; margin-top: 4vh;">
+      The skeptics were watching the puck. He was watching where it was going.
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 6 — LIVE DEMO ============ -->
+  <section class="slide demo">
+    <div>
+      <h1><span class="live-dot"></span>LIVE</h1>
+    </div>
+    <div class="sub">
+      Pick one — 90 seconds. Build it in front of them.<br/><br/>
+      &nbsp;1. <b>Streamlit option-chain app</b> — from one prompt to working code<br/>
+      &nbsp;2. <b>Messy Excel</b> → cleaned, pivoted, charted, summarized<br/>
+      &nbsp;3. <b>P&amp;L screenshot</b> → trade analysis &amp; what went wrong<br/><br/>
+      <span class="accent">Goal: the audible gasp.</span><br/>
+      This is the moment that converts skeptics.
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 7 — WHO IS WINNING ============ -->
+  <section class="slide">
+    <h2>While the giants fall, <span class="accent2">individuals are rising</span>.</h2>
+    <p class="muted">The leverage just moved from organizations to individuals — the ones who know how to use the tools.</p>
+
+    <div class="profiles">
+      <div class="profile">
+        <h3>The Solo Founder</h3>
+        <p>One person. $1M ARR. No team. No funding. The product is built and shipped by Claude under their direction.</p>
+      </div>
+      <div class="profile">
+        <h3>The 19-Year-Old</h3>
+        <p>Building production software in a weekend that a 10-person engineering team would have built across a quarter in 2023.</p>
+      </div>
+      <div class="profile">
+        <h3>The Non-Coder</h3>
+        <p>Zero CS background. Shipped and sold an app using Claude + Cursor. The "you must learn to code" gate just fell.</p>
+      </div>
+    </div>
+
+    <div class="bottom-line">
+      The new asset class isn't capital. It's <span class="accent">leverage through AI</span>.
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 8 — THE FORK ============ -->
+  <section class="slide">
+    <h2>You don't get to opt out.<br/>You get to choose <span class="accent">which column</span>.</h2>
+
+    <div class="fork">
+      <div class="fork-col left">
+        <h3>The 2024 Engineer</h3>
+        <ul>
+          <li>Writes code line-by-line</li>
+          <li>Memorizes syntax</li>
+          <li>One task at a time</li>
+          <li>Asks Stack Overflow</li>
+          <li>Salary scales with hours</li>
+          <li>Replaceable</li>
+        </ul>
+      </div>
+      <div class="fork-col right">
+        <h3>The 2026 Operator</h3>
+        <ul>
+          <li>Defines problems precisely</li>
+          <li>Orchestrates agents</li>
+          <li>Fleet of parallel AIs</li>
+          <li>Asks Claude</li>
+          <li>Output scales with leverage</li>
+          <li>Irreplaceable</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 9 — COURSE PROMISE ============ -->
+  <section class="slide">
+    <h2>By the end of this course, <span class="accent">you will be able to</span>:</h2>
+
+    <div class="promise">
+      <div class="item"><div class="num">01</div><div class="txt">Take any idea from sentence → working software in a weekend</div></div>
+      <div class="item"><div class="num">02</div><div class="txt">Use Claude, Cursor, and Claude Code as daily tools — not toys</div></div>
+      <div class="item"><div class="num">03</div><div class="txt">Build AI agents that work <i>for you</i> while you sleep</div></div>
+      <div class="item"><div class="num">04</div><div class="txt">Design prompts and workflows that 10× your output</div></div>
+      <div class="item"><div class="num">05</div><div class="txt">Read AI's limits — when it's lying, when it's right, when to step in</div></div>
+    </div>
+
+    <div class="bottom-line">Not theory. Not someday. By Week 12.</div>
+  </section>
+
+  <!-- ============ SLIDE 10 — CLOSE (clean black with big text only) ============ -->
+  <section class="slide" style="background:#000; align-items:center; justify-content:center; text-align:center;">
+    <div style="max-width:80vw;">
+      <h1 style="font-family:Georgia,serif; font-size: clamp(60px, 8vw, 140px); line-height:1.05; letter-spacing:-0.02em; color:#fff;">
+        The puck is<br/>here now.
+      </h1>
+      <h1 style="font-family:Georgia,serif; font-size: clamp(80px, 10vw, 180px); line-height:1; margin-top:4vh; color: var(--accent); text-shadow: 0 0 60px rgba(167,139,250,0.5);">
+        Skate.
+      </h1>
+    </div>
+  </section>
+
+</div>
+
+<div class="hint">← →  navigate · F  fullscreen</div>
+<div class="pagenum"><span id="cur">1</span> / <span id="total">10</span></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let idx = 0;
+  document.getElementById('total').textContent = slides.length;
+
+  function show(i) {
+    idx = (i + slides.length) % slides.length;
+    slides.forEach((s, n) => s.classList.toggle('active', n === idx));
+    document.getElementById('cur').textContent = idx + 1;
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') show(idx + 1);
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') show(idx - 1);
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key.toLowerCase() === 'f') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+  document.addEventListener('click', () => show(idx + 1));
+</script>
+
+</body>
+</html>
