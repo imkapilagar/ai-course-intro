@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>AI Course — Intro Deck</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-card: #14141c;
+    --ink: #f5f5f7;
+    --muted: #8a8a99;
+    --accent: #a78bfa;
+    --accent-2: #22d3ee;
+    --danger: #ef4444;
+    --good: #22c55e;
+    --line: #2a2a36;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "SF Pro Display", "Segoe UI", Inter, system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  /* ========== UPGRADE 2: Animated background grid ========== */
+  .slide::after {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+      radial-gradient(circle, rgba(167,139,250,0.12) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.35;
+    z-index: 0;
+    animation: gridDrift 25s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes gridDrift {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(40px, 40px); }
+  }
+  .slide > * { position: relative; z-index: 1; }
+
+  /* ========== UPGRADE 6: Cinematic slide transitions ========== */
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 5vh 6vw;
+    background: radial-gradient(ellipse at top left, #1a1a2e 0%, #0a0a0f 60%);
+    animation: cinematic 0.55s cubic-bezier(.16,1,.3,1);
+  }
+  .slide.active { display: flex; }
+  @keyframes cinematic {
+    from { opacity: 0; transform: scale(0.97); filter: blur(6px); }
+    to   { opacity: 1; transform: scale(1);    filter: blur(0px); }
+  }
+
+  /* --- typography --- */
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: clamp(40px, 5.2vw, 84px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-size: clamp(28px, 3vw, 48px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 2.5vh;
+  }
+  h3 { font-size: clamp(20px, 1.8vw, 28px); font-weight: 600; }
+  p, li { font-size: clamp(16px, 1.4vw, 22px); line-height: 1.55; color: var(--ink); }
+  .muted { color: var(--muted); }
+  .accent { color: var(--accent); }
+  .accent2 { color: var(--accent-2); }
+  .danger { color: var(--danger); }
+  .good { color: var(--good); }
+  .quote-attrib { font-size: clamp(18px, 1.4vw, 24px); color: var(--muted); margin-top: 2vh; font-style: italic; }
+
+  /* --- nav / hint --- */
+  .hint {
+    position: fixed;
+    bottom: 2vh;
+    left: 2vw;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    z-index: 10;
+  }
+
+  /* ========== UPGRADE 5: Progress bar ========== */
+  .progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    z-index: 20;
+    transition: width 0.4s cubic-bezier(.16,1,.3,1);
+    box-shadow: 0 0 12px var(--accent), 0 0 24px rgba(167,139,250,0.3);
+  }
+
+  /* ========== UPGRADE 1: Staggered reveal system ========== */
+  .reveal-item {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.45s cubic-bezier(.16,1,.3,1),
+                transform 0.45s cubic-bezier(.16,1,.3,1);
+    pointer-events: none;
+  }
+  .reveal-item.revealed {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* ========== Opening slide (plain white) ========== */
+  .opener {
+    background: #fff !important;
+    padding: 0 !important;
+  }
+  .opener::after { display: none; }
+
+  /* ========== UPGRADE 3: Typewriter effect ========== */
+  .typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 3px solid var(--accent);
+    width: 0;
+    animation: typeExpand 1.8s cubic-bezier(.16,1,.3,1) forwards,
+               cursorBlink 0.7s step-end infinite;
+  }
+  .typewriter.line2 {
+    animation: typeExpand 1.4s cubic-bezier(.16,1,.3,1) 0.9s forwards,
+               cursorBlink 0.7s step-end 0.9s infinite;
+  }
+  @keyframes typeExpand {
+    from { width: 0; }
+    to   { width: 100%; }
+  }
+  @keyframes cursorBlink {
+    50% { border-color: transparent; }
+  }
+
+  /* ========== UPGRADE 4: Glowing pulsing borders ========== */
+  @keyframes breathe {
+    0%, 100% { box-shadow: 0 0 8px rgba(167,139,250,0.15); }
+    50%      { box-shadow: 0 0 25px rgba(167,139,250,0.4), 0 0 50px rgba(167,139,250,0.15); }
+  }
+  @keyframes breatheCyan {
+    0%, 100% { box-shadow: 0 0 8px rgba(34,211,238,0.15); }
+    50%      { box-shadow: 0 0 25px rgba(34,211,238,0.4), 0 0 50px rgba(34,211,238,0.15); }
+  }
+  @keyframes breatheRed {
+    0%, 100% { box-shadow: 0 0 8px rgba(239,68,68,0.1); }
+    50%      { box-shadow: 0 0 20px rgba(239,68,68,0.3), 0 0 40px rgba(239,68,68,0.1); }
+  }
+  @keyframes breatheGreen {
+    0%, 100% { box-shadow: 0 0 8px rgba(34,197,94,0.1); }
+    50%      { box-shadow: 0 0 20px rgba(34,197,94,0.3), 0 0 40px rgba(34,197,94,0.1); }
+  }
+
+  /* --- slide 1 hero --- */
+  .hero {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #000;
+  }
+  .hero::after { display: none; }
+  .hero .bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+    z-index: 0;
+  }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%);
+    z-index: 1;
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 80vw; }
+  .hero h1 {
+    font-size: clamp(36px, 4.5vw, 72px);
+    line-height: 1.15;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.8);
+  }
+
+  /* --- timeline (slide 3) --- */
+  .timeline {
+    position: relative;
+    margin-top: 6vh;
+    padding: 6vh 0;
+  }
+  .timeline-line {
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent) 10%, var(--accent-2) 90%, transparent);
+  }
+  .milestones {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    position: relative;
+    z-index: 2;
+  }
+  .milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 0.5vw;
+  }
+  .milestone .dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 5px rgba(167,139,250,0.18), 0 0 25px var(--accent);
+    margin: 14px 0;
+  }
+  .milestone:nth-child(even) .dot { background: var(--accent-2); box-shadow: 0 0 0 5px rgba(34,211,238,0.18), 0 0 25px var(--accent-2); }
+  .milestone .date {
+    font-size: clamp(13px, 1vw, 16px);
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .milestone .title {
+    font-weight: 700;
+    font-size: clamp(15px, 1.15vw, 19px);
+    margin-top: 6px;
+    color: var(--ink);
+  }
+  .milestone .desc {
+    font-size: clamp(12px, 0.95vw, 15px);
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .milestone.top .info { order: -1; margin-bottom: 14px; }
+  .milestone.bot .info { order: 1; margin-top: 14px; }
+
+  /* --- tables / data slides --- */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 3vh;
+  }
+  .data-table th, .data-table td {
+    text-align: left;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    font-size: clamp(15px, 1.2vw, 19px);
+  }
+  .data-table th {
+    color: var(--muted);
+    font-size: clamp(12px, 0.9vw, 14px);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .data-table td.red { color: var(--danger); font-weight: 700; }
+  .data-table td.green { color: var(--good); font-weight: 700; }
+
+  /* --- big stat boxes with breathing glow --- */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2vw;
+    margin-top: 4vh;
+  }
+  .stat-card {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 14px;
+    padding: 3vh 2vw;
+    text-align: center;
+    animation: breatheRed 3s ease-in-out infinite;
+  }
+  .stat-card.good {
+    background: rgba(34, 197, 94, 0.08);
+    border-color: rgba(34, 197, 94, 0.35);
+    animation: breatheGreen 3s ease-in-out infinite;
+  }
+  .stat-card .big {
+    font-family: Georgia, serif;
+    font-size: clamp(36px, 4.5vw, 64px);
+    font-weight: 700;
+    color: var(--danger);
+    line-height: 1;
+  }
+  .stat-card.good .big { color: var(--good); }
+  .stat-card .lbl {
+    margin-top: 12px;
+    color: var(--ink);
+    font-size: clamp(13px, 1.1vw, 17px);
+    line-height: 1.4;
+  }
+
+  /* --- two-column fork slide --- */
+  .fork {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3vw;
+    margin-top: 4vh;
+  }
+  .fork-col {
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 3vh 2vw;
+    border: 1px solid var(--line);
+  }
+  .fork-col.right {
+    border-color: var(--accent);
+    animation: breathe 3s ease-in-out infinite;
+  }
+  .fork-col h3 { margin-bottom: 2vh; }
+  .fork-col.left h3 { color: var(--muted); }
+  .fork-col.right h3 { color: var(--accent); }
+  .fork-col ul { list-style: none; }
+  .fork-col li {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: clamp(14px, 1.1vw, 18px);
+  }
+  .fork-col li:last-child { border-bottom: none; }
+
+  /* --- quote slide --- */
+  .quote-slide {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .quote-slide blockquote {
+    font-family: Georgia, serif;
+    font-size: clamp(28px, 3.2vw, 52px);
+    line-height: 1.3;
+    max-width: 85vw;
+    font-style: italic;
+    color: var(--ink);
+  }
+  .quote-slide blockquote::before {
+    content: '\201C';
+    color: var(--accent);
+    font-size: 1.5em;
+    line-height: 0.5;
+    margin-right: 6px;
+  }
+
+  /* --- promise list --- */
+  .promise {
+    margin-top: 4vh;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+  }
+  .promise .item {
+    display: flex;
+    gap: 2vw;
+    align-items: baseline;
+    padding: 18px 24px;
+    background: var(--bg-card);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+  }
+  .promise .num {
+    font-family: Georgia, serif;
+    font-size: clamp(24px, 2.4vw, 36px);
+    color: var(--accent);
+    font-weight: 700;
+    min-width: 50px;
+  }
+  .promise .txt { font-size: clamp(16px, 1.3vw, 21px); }
+
+  /* --- profiles for slide 7 --- */
+  .profiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2vw;
+    margin-top: 5vh;
+  }
+  .profile {
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 3vh 2vw;
+    border-top: 3px solid var(--accent-2);
+    animation: breatheCyan 3.5s ease-in-out infinite;
+  }
+  .profile:nth-child(2) { animation-delay: 0.5s; }
+  .profile:nth-child(3) { animation-delay: 1s; }
+  .profile h3 {
+    color: var(--accent-2);
+    font-size: clamp(18px, 1.5vw, 24px);
+    margin-bottom: 12px;
+  }
+  .profile p { color: var(--muted); font-size: clamp(13px, 1.05vw, 17px); }
+
+  /* --- bottom line strip --- */
+  .bottom-line {
+    margin-top: auto;
+    padding-top: 4vh;
+    font-size: clamp(18px, 1.6vw, 26px);
+    color: var(--accent);
+    font-weight: 600;
+    font-style: italic;
+  }
+
+  /* --- demo slide --- */
+  .demo {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .demo .live-dot {
+    display: inline-block;
+    width: 16px; height: 16px;
+    background: var(--danger);
+    border-radius: 50%;
+    animation: blink 1.2s infinite;
+    margin-right: 14px;
+    box-shadow: 0 0 20px var(--danger);
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .demo h1 { color: var(--danger); }
+  .demo .sub { margin-top: 4vh; color: var(--muted); font-size: clamp(18px, 1.5vw, 26px); max-width: 70vw; }
+
+  /* --- About instructors slide --- */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5vw;
+    margin-top: 3vh;
+    flex: 1;
+  }
+  .about-card {
+    position: relative;
+    background:
+      radial-gradient(120% 80% at 0% 0%, rgba(167,139,250,0.10), transparent 60%),
+      linear-gradient(180deg, #181822 0%, #0f0f17 100%);
+    border-radius: 20px;
+    padding: 3.5vh 2.4vw;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(167,139,250,0.18);
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.45);
+  }
+  .about-card.right {
+    background:
+      radial-gradient(120% 80% at 100% 0%, rgba(34,211,238,0.10), transparent 60%),
+      linear-gradient(180deg, #181822 0%, #0f0f17 100%);
+    border-color: rgba(34,211,238,0.18);
+  }
+  .about-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: rail 4s ease-in-out infinite;
+    z-index: 2;
+  }
+  .about-card.right::before {
+    background: linear-gradient(90deg, transparent, var(--accent-2), transparent);
+    animation-delay: 1.5s;
+  }
+  @keyframes rail {
+    0%, 100% { opacity: 0.5; transform: translateX(-10%); }
+    50%      { opacity: 1;   transform: translateX(10%); }
+  }
+  .about-head {
+    display: flex;
+    align-items: center;
+    gap: 1.4vw;
+    margin-bottom: 2.5vh;
+    padding-bottom: 2vh;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .headshot-wrap {
+    width: clamp(78px, 6.4vw, 110px);
+    height: clamp(78px, 6.4vw, 110px);
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3px solid rgba(167,139,250,0.55);
+    box-shadow: 0 0 30px rgba(167,139,250,0.45);
+    background: #0a0a0f;
+    position: relative;
+  }
+  .about-card.right .headshot-wrap {
+    border-color: rgba(34,211,238,0.55);
+    box-shadow: 0 0 30px rgba(34,211,238,0.45);
+  }
+  .headshot-wrap img {
+    width: 130%;
+    height: 130%;
+    object-fit: cover;
+    object-position: center 30%;
+    position: absolute;
+    top: -15%;
+    left: -15%;
+    display: block;
+  }
+  .about-card.right .headshot-wrap img {
+    width: 100%;
+    height: 100%;
+    object-position: center 30%;
+    top: 0;
+    left: 0;
+  }
+  .about-name {
+    font-family: Georgia, serif;
+    font-size: clamp(30px, 2.6vw, 44px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .about-role {
+    color: var(--accent);
+    font-size: clamp(15px, 1.2vw, 20px);
+    margin-top: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .about-card.right .about-role { color: var(--accent-2); }
+  .about-tagline {
+    font-style: italic;
+    color: #cfcfdc;
+    font-size: clamp(16px, 1.35vw, 22px);
+    margin-bottom: 2vh;
+    line-height: 1.4;
+  }
+  .about-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6vh;
+  }
+  .about-card li {
+    font-size: clamp(16px, 1.3vw, 22px);
+    color: #e4e4ee;
+    padding-left: 26px;
+    position: relative;
+    line-height: 1.45;
+  }
+  .about-card li b { color: #fff; font-weight: 700; }
+  .about-card li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: clamp(8px, 0.7vw, 12px);
+    width: 14px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .about-card.right li::before { background: var(--accent-2); }
+
+  /* --- Staged reveal on the About slide --- */
+  .about-slide .about-card {
+    opacity: 0;
+    transform: translateX(-60px) scale(0.96);
+    transition: opacity 600ms cubic-bezier(.2,.7,.2,1),
+                transform 600ms cubic-bezier(.2,.7,.2,1),
+                grid-column 600ms cubic-bezier(.2,.7,.2,1);
+    pointer-events: none;
+  }
+  .about-slide .about-card.right {
+    transform: translateX(60px) scale(0.96);
+  }
+  .about-slide[data-stage="1"] .about-card.left {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    grid-column: 1 / span 2;
+    max-width: 60%;
+    margin: 0 auto;
+    pointer-events: auto;
+  }
+  .about-slide[data-stage="2"] .about-card.left,
+  .about-slide[data-stage="2"] .about-card.right {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    max-width: none;
+    margin: 0;
+    pointer-events: auto;
+  }
+
+  /* --- CEO quote cards (for staggered reveal styling) --- */
+  .ceo-quote {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 2vw;
+    align-items: center;
+    background: var(--bg-card);
+    padding: 1.8vh 2vw;
+    border-radius: 10px;
+  }
+  .ceo-quote .ceo-date {
+    text-align: center;
+  }
+  .ceo-quote .ceo-date-val {
+    font-family: Georgia, serif;
+    font-size: clamp(20px, 1.7vw, 28px);
+    font-weight: 700;
+  }
+  .ceo-quote .ceo-date-src {
+    color: var(--muted);
+    font-size: clamp(11px, 0.9vw, 14px);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .ceo-quote .ceo-text {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: clamp(18px, 1.65vw, 26px);
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .ceo-quote .ceo-name {
+    color: var(--muted);
+    font-size: clamp(14px, 1.1vw, 18px);
+    margin-top: 6px;
+  }
+
+  /* --- Closing slide typewriter overrides --- */
+  .close-slide::after { display: none; }
+
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ============ SLIDE 1 — WHITE OPENER (waiting screen) ============ -->
+  <section class="slide opener active"></section>
+
+  <!-- ============ SLIDE 2 — BEZOS QUOTE (full image) ============ -->
+  <section class="slide" style="background:#fff !important; padding:0;">
+    <img src="assets/BezosQuote.png" alt="Jeff Bezos quote — lean into the future"
+         style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#fff; z-index:2;" />
+  </section>
+
+  <!-- ============ SLIDE 2 — ABOUT THE INSTRUCTORS ============ -->
+  <section class="slide about-slide" data-stage="0">
+    <h2>Who's <span class="accent">teaching</span> this session</h2>
+    <p class="muted">Two practitioners. Markets and systems — taught by people who actually trade them.</p>
+
+    <div class="about-grid">
+      <div class="about-card left">
+        <div class="about-head">
+          <div class="headshot-wrap"><img src="assets/vishal.png" alt="Vishal Mehta" /></div>
+          <div>
+            <div class="about-name">Vishal Mehta</div>
+            <div class="about-role">Systematic Trader &middot; Mentor</div>
+          </div>
+        </div>
+        <div class="about-tagline">"Trading is a business. Risk management is the strategy. Everything else is noise."</div>
+        <ul>
+          <li>Ex-<b>Reuters</b> &amp; <b>Bloomberg</b> &middot; deep market-data &amp; institutional background</li>
+          <li><b>Rule-based, systematic</b> approach &mdash; emotion stripped out, recipe-style execution</li>
+          <li>Lives by the <b>"WHY"</b> &mdash; questions the root cause until the philosophy is clear</li>
+          <li><b>Risk-first, capital preservation</b> &mdash; trading run like an insurance business</li>
+          <li>Trading is a <b>marathon</b> &mdash; consistency across regimes, not daily heroics</li>
+        </ul>
+      </div>
+
+      <div class="about-card right">
+        <div class="about-head">
+          <div class="headshot-wrap"><img src="assets/kapil.png" alt="Kapil Agarwal" /></div>
+          <div>
+            <div class="about-name">Kapil Agarwal</div>
+            <div class="about-role">Systematic Trader &middot; Builder</div>
+          </div>
+        </div>
+        <div class="about-tagline">"Control the unknowns. Diversify the positions. Engineer the failure modes out."</div>
+        <ul>
+          <li><b>B.Tech in Computer Science</b> &middot; short stint in IT before going full-time on markets</li>
+          <li>Trading markets since <b>2017</b> &mdash; discretionary didn't work, went fully <b>systematic</b></li>
+          <li><b>Migrating</b> from no-code platforms to self-built systems</li>
+          <li>Built a <b>multi-strategy, multi-broker execution stack</b> &mdash; signal-based entries, trailing stops, crash recovery, event-sourced audit</li>
+          <li><b>Safety-first systems</b> &mdash; missing SL, half-filled spreads, mid-day crashes &mdash; all handled. Instant Telegram alerts.</li>
+          <li><b>Hardened by live incidents</b> &mdash; what breaks once never breaks the same way twice</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 3 — CLAUDE TIMELINE ============ -->
+  <section class="slide">
+    <h2>In 12 months, AI went from <span class="accent">assistant</span> to <span class="accent2">coworker</span>.</h2>
+
+    <div class="timeline">
+      <div class="timeline-line"></div>
+      <div class="milestones">
+        <div class="milestone top reveal-item">
+          <div class="info">
+            <div class="date">SEP 2025</div>
+            <div class="title">Sonnet 4.5</div>
+            <div class="desc">30+ hours of autonomous coding</div>
+          </div>
+          <div class="dot"></div>
+        </div>
+        <div class="milestone bot reveal-item">
+          <div class="dot"></div>
+          <div class="info">
+            <div class="date">NOV 2025</div>
+            <div class="title">Opus 4.5</div>
+            <div class="desc">Workplace automation</div>
+          </div>
+        </div>
+        <div class="milestone top reveal-item">
+          <div class="info">
+            <div class="date">JAN 2026</div>
+            <div class="title">Claude Cowork</div>
+            <div class="desc">Enterprise applications</div>
+          </div>
+          <div class="dot"></div>
+        </div>
+        <div class="milestone bot reveal-item">
+          <div class="dot"></div>
+          <div class="info">
+            <div class="date">FEB 2026</div>
+            <div class="title">Opus 4.6 + Agent Teams</div>
+            <div class="desc">1M context &middot; multi-agent</div>
+          </div>
+        </div>
+        <div class="milestone top reveal-item">
+          <div class="info">
+            <div class="date">FEB 2026</div>
+            <div class="title">COBOL Playbook</div>
+            <div class="desc">Legacy mainframe modernization</div>
+          </div>
+          <div class="dot"></div>
+        </div>
+        <div class="milestone bot reveal-item">
+          <div class="dot"></div>
+          <div class="info">
+            <div class="date">APR 2026</div>
+            <div class="title">Opus 4.7</div>
+            <div class="desc">Self-verifying &middot; vision &middot; xhigh reasoning</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-line reveal-item">
+      Five major capability jumps in one year. We are not on a normal technology curve.
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 4 — INDIAN IT COLLAPSE ============ -->
+  <section class="slide">
+    <h2>India's IT sector lost <span class="danger">a quarter of its value</span> in 12 months. The market is telling you which way the future leans.</h2>
+
+    <table class="data-table reveal-item">
+      <thead>
+        <tr>
+          <th>Index / Stock</th>
+          <th>1-Year Return</th>
+          <th>YTD 2026</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><b>Nifty IT</b></td><td class="red">&ndash;19%</td><td class="red">&ndash;25.4% &nbsp;<span class="muted">(worst sector)</span></td></tr>
+        <tr><td><b>BSE IT</b></td><td class="red">&ndash;20%</td><td class="red">near 3-year low</td></tr>
+        <tr><td><b>Nifty 50</b> (broad market)</td><td class="muted">&ndash;1.44%</td><td class="muted">&ndash;9.7%</td></tr>
+        <tr><td>TCS</td><td class="red">&ndash;7.88%</td><td class="red">near 52-week low</td></tr>
+        <tr><td>Infosys</td><td class="red">sharp fall</td><td class="red">&ndash;22%</td></tr>
+        <tr><td>HCL Technologies</td><td class="green">+24.39%</td><td class="muted">(lone outperformer — AI services book)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="stat-grid">
+      <div class="stat-card reveal-item"><div class="big">&ndash;25.4%</div><div class="lbl">Nifty IT YTD 2026</div></div>
+      <div class="stat-card reveal-item"><div class="big">&#x20B9;70,000 Cr</div><div class="lbl">TCS market cap erased in one quarter</div></div>
+      <div class="stat-card reveal-item"><div class="big">&#x20B9;54,000 Cr</div><div class="lbl">Infosys market cap erased in one quarter</div></div>
+    </div>
+
+    <div class="bottom-line reveal-item">
+      "Infosys shares are down partly due to launch of new models from Gen-AI platforms like Claude&hellip;" &nbsp;&mdash; Indian financial press, May 2026
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 5 — US CARNAGE ============ -->
+  <section class="slide">
+    <h2>One Anthropic blog post wiped <span class="danger">$40 billion</span> off IBM.</h2>
+
+    <table class="data-table reveal-item">
+      <thead>
+        <tr><th>Date</th><th>Event</th><th>Damage</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Feb 3, 2026</td>
+          <td>Claude Cowork launches</td>
+          <td class="red"><b>$285B</b> wiped off US software in one day</td>
+        </tr>
+        <tr>
+          <td>Feb 5, 2026</td>
+          <td>Opus 4.6 + Agent Teams</td>
+          <td class="red">"SaaSpocalypse" &middot; Salesforce &ndash;25% YTD &middot; SAP &ndash;18%</td>
+        </tr>
+        <tr>
+          <td>Feb 23, 2026</td>
+          <td>Claude Code COBOL Playbook</td>
+          <td class="red"><b>IBM &ndash;13%, ~$40B gone</b> (worst day since 2000)</td>
+        </tr>
+        <tr>
+          <td>Feb 23, 2026</td>
+          <td>Same day collateral</td>
+          <td class="red">Accenture &ndash;6.6% &middot; Cognizant &ndash;6.0%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="stat-grid" style="margin-top: 5vh;">
+      <div class="stat-card good reveal-item"><div class="big">$60B</div><div class="lbl">Anthropic valuation, Nov 2024</div></div>
+      <div class="stat-card good reveal-item"><div class="big">$380B</div><div class="lbl">Series G, Feb 2026</div></div>
+      <div class="stat-card good reveal-item"><div class="big">$900B</div><div class="lbl">Talks underway, May 2026</div></div>
+    </div>
+
+    <div class="bottom-line reveal-item">
+      The companies <b>leaning away</b> lost over <b>$1 trillion</b> in market cap. The one <b>leaning in</b> is up 15&times;.
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 6 — CHORUS OF CEOs ============ -->
+  <section class="slide" style="justify-content: center;">
+    <h2 style="font-size: clamp(32px, 3.4vw, 54px); margin-bottom: 0.8vh;">The people <span class="accent">building AI</span> have been saying it for 3 years.</h2>
+    <p class="muted" style="font-size: clamp(18px, 1.5vw, 24px);">Five companies. One direction. Listen to the chorus.</p>
+
+    <div style="display:flex; flex-direction: column; gap: 1.6vh; margin-top: 3vh;">
+
+      <div class="ceo-quote reveal-item" style="border-left: 4px solid var(--accent);">
+        <div class="ceo-date">
+          <div class="ceo-date-val" style="color: var(--accent);">JAN 2023</div>
+          <div class="ceo-date-src">Tweet</div>
+        </div>
+        <div>
+          <div class="ceo-text">"The hottest new programming language is English."</div>
+          <div class="ceo-name"><b>Andrej Karpathy</b> &mdash; ex-OpenAI, ex-Tesla AI</div>
+        </div>
+      </div>
+
+      <div class="ceo-quote reveal-item" style="border-left: 4px solid var(--accent-2);">
+        <div class="ceo-date">
+          <div class="ceo-date-val" style="color: var(--accent-2);">FEB 2024</div>
+          <div class="ceo-date-src">WGS Dubai</div>
+        </div>
+        <div>
+          <div class="ceo-text">"Nobody has to program — the programming language is human. Everybody in the world is now a programmer."</div>
+          <div class="ceo-name"><b>Jensen Huang</b> &mdash; CEO, NVIDIA</div>
+        </div>
+      </div>
+
+      <div class="ceo-quote reveal-item" style="border-left: 4px solid var(--accent);">
+        <div class="ceo-date">
+          <div class="ceo-date-val" style="color: var(--accent);">OCT 2024</div>
+          <div class="ceo-date-src">Q3 Earnings</div>
+        </div>
+        <div>
+          <div class="ceo-text">"More than <span class="accent">25% of new code</span> at Google is now generated by AI &mdash; and reviewed by engineers."</div>
+          <div class="ceo-name"><b>Sundar Pichai</b> &mdash; CEO, Google / Alphabet</div>
+        </div>
+      </div>
+
+      <div class="ceo-quote reveal-item" style="border-left: 4px solid var(--accent-2);">
+        <div class="ceo-date">
+          <div class="ceo-date-val" style="color: var(--accent-2);">JAN 2025</div>
+          <div class="ceo-date-src">Joe Rogan</div>
+        </div>
+        <div>
+          <div class="ceo-text">"In 2025, Meta will have an AI that is effectively a <span class="accent2">mid-level engineer</span>. Most of our app code will be built by AI."</div>
+          <div class="ceo-name"><b>Mark Zuckerberg</b> &mdash; CEO, Meta</div>
+        </div>
+      </div>
+
+      <div class="ceo-quote reveal-item" style="border-left: 4px solid var(--accent); background: rgba(167,139,250,0.10); box-shadow: 0 0 30px rgba(167,139,250,0.15);">
+        <div class="ceo-date">
+          <div class="ceo-date-val" style="color: var(--accent);">MAR 2025</div>
+          <div class="ceo-date-src">CFR Event</div>
+        </div>
+        <div>
+          <div class="ceo-text">"In 3&ndash;6 months, AI writes <span class="accent">90% of code</span>. In 12 months, essentially all of it."</div>
+          <div class="ceo-name"><b>Dario Amodei</b> &mdash; CEO, Anthropic</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="reveal-item" style="margin-top: 3vh; font-size: clamp(18px, 1.7vw, 26px); color: var(--accent); font-weight:600; font-style:italic; text-align:center;">Five different companies. Same direction.</div>
+  </section>
+
+  <!-- ============ SLIDE 7 — LIVE DEMO ============ -->
+  <section class="slide demo">
+    <div>
+      <h1><span class="live-dot"></span>LIVE</h1>
+    </div>
+    <div class="sub">
+      Pick one — 90 seconds. Build it in front of them.<br/><br/>
+      &nbsp;1. <b>Streamlit option-chain app</b> — from one prompt to working code<br/>
+      &nbsp;2. <b>Messy Excel</b> &rarr; cleaned, pivoted, charted, summarized<br/>
+      &nbsp;3. <b>P&amp;L screenshot</b> &rarr; trade analysis &amp; what went wrong<br/><br/>
+      <span class="accent">Goal: the audible gasp.</span><br/>
+      This is the moment that converts skeptics.
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 8 — WHO IS WINNING ============ -->
+  <section class="slide">
+    <h2>While the giants fall, <span class="accent2">individuals are rising</span>.</h2>
+    <p class="muted">The leverage just moved from organizations to individuals &mdash; the ones who know how to use the tools.</p>
+
+    <div class="profiles">
+      <div class="profile reveal-item">
+        <h3>The Solo Founder</h3>
+        <p>One person. $1M ARR. No team. No funding. The product is built and shipped by Claude under their direction.</p>
+      </div>
+      <div class="profile reveal-item">
+        <h3>The 19-Year-Old</h3>
+        <p>Building production software in a weekend that a 10-person engineering team would have built across a quarter in 2023.</p>
+      </div>
+      <div class="profile reveal-item">
+        <h3>The Non-Coder</h3>
+        <p>Zero CS background. Shipped and sold an app using Claude + Cursor. The "you must learn to code" gate just fell.</p>
+      </div>
+    </div>
+
+    <div class="bottom-line reveal-item">
+      The new asset class isn't capital. It's <span class="accent">leverage through AI</span>.
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 9 — THE FORK ============ -->
+  <section class="slide">
+    <h2>You don't get to opt out.<br/>You get to choose <span class="accent">which column</span>.</h2>
+
+    <div class="fork">
+      <div class="fork-col left reveal-item">
+        <h3>The 2024 Engineer</h3>
+        <ul>
+          <li>Writes code line-by-line</li>
+          <li>Memorizes syntax</li>
+          <li>One task at a time</li>
+          <li>Asks Stack Overflow</li>
+          <li>Salary scales with hours</li>
+          <li>Replaceable</li>
+        </ul>
+      </div>
+      <div class="fork-col right reveal-item">
+        <h3>The 2026 Operator</h3>
+        <ul>
+          <li>Defines problems precisely</li>
+          <li>Orchestrates agents</li>
+          <li>Fleet of parallel AIs</li>
+          <li>Asks Claude</li>
+          <li>Output scales with leverage</li>
+          <li>Irreplaceable</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 10 — COURSE PROMISE ============ -->
+  <section class="slide">
+    <h2>By the end of this course, <span class="accent">you will be able to</span>:</h2>
+
+    <div class="promise">
+      <div class="item reveal-item"><div class="num">01</div><div class="txt">Take any idea from sentence &rarr; working software in a weekend</div></div>
+      <div class="item reveal-item"><div class="num">02</div><div class="txt">Use Claude, Cursor, and Claude Code as daily tools &mdash; not toys</div></div>
+      <div class="item reveal-item"><div class="num">03</div><div class="txt">Build AI agents that work <i>for you</i> while you sleep</div></div>
+      <div class="item reveal-item"><div class="num">04</div><div class="txt">Design prompts and workflows that 10&times; your output</div></div>
+      <div class="item reveal-item"><div class="num">05</div><div class="txt">Read AI's limits &mdash; when it's lying, when it's right, when to step in</div></div>
+    </div>
+
+    <div class="bottom-line reveal-item">Not theory. Not someday. By Week 12.</div>
+  </section>
+
+  <!-- ============ SLIDE 11 — COURSE ROADMAP (12 WEEKS) ============ -->
+  <section class="slide">
+    <h2>What we'll do &mdash; <span class="accent">12 weeks, 4 phases</span></h2>
+    <p class="muted" style="margin-bottom: 2vh;">Each phase builds on the last. By Week 12 you ship a real, working AI-powered trading toolkit.</p>
+
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 1.5vw; margin-top: 3vh;">
+      <div class="reveal-item" style="background: var(--bg-card); border-top: 3px solid var(--accent); border-radius: 10px; padding: 3vh 1.5vw;">
+        <div style="color: var(--accent); font-size: clamp(13px, 1vw, 16px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px;">Weeks 1&ndash;3</div>
+        <h3 style="font-size: clamp(20px, 1.6vw, 26px); margin-bottom: 12px;">Foundations</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1.05vw, 17px); line-height: 1.5;">Talk to AI like an operator. Prompting, Claude, Cursor, Claude Code &mdash; the tools and the mindset.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); border-top: 3px solid var(--accent-2); border-radius: 10px; padding: 3vh 1.5vw;">
+        <div style="color: var(--accent-2); font-size: clamp(13px, 1vw, 16px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px;">Weeks 4&ndash;6</div>
+        <h3 style="font-size: clamp(20px, 1.6vw, 26px); margin-bottom: 12px;">Build for yourself</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1.05vw, 17px); line-height: 1.5;">Trading journal, research bot, data cleaning pipelines. Small wins, daily leverage.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); border-top: 3px solid var(--accent); border-radius: 10px; padding: 3vh 1.5vw;">
+        <div style="color: var(--accent); font-size: clamp(13px, 1vw, 16px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px;">Weeks 7&ndash;9</div>
+        <h3 style="font-size: clamp(20px, 1.6vw, 26px); margin-bottom: 12px;">Build for the market</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1.05vw, 17px); line-height: 1.5;">Backtesting engines, signal generators, option-chain dashboards. The tools you wish existed.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); border-top: 3px solid var(--accent-2); border-radius: 10px; padding: 3vh 1.5vw;">
+        <div style="color: var(--accent-2); font-size: clamp(13px, 1vw, 16px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px;">Weeks 10&ndash;12</div>
+        <h3 style="font-size: clamp(20px, 1.6vw, 26px); margin-bottom: 12px;">Automate</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1.05vw, 17px); line-height: 1.5;">Agents that run while you sleep. Production deployment. AI working <i>for</i> you, not next to you.</p>
+      </div>
+    </div>
+
+    <div class="bottom-line reveal-item">Not a syllabus. A flight plan.</div>
+  </section>
+
+  <!-- ============ SLIDE 12 — HOW WE'LL DO IT ============ -->
+  <section class="slide">
+    <h2>How we'll do it</h2>
+    <p class="muted">Three commitments. No fluff.</p>
+
+    <div style="display:flex; flex-direction:column; gap: 2.5vh; margin-top: 4vh;">
+      <div class="reveal-item" style="display:flex; gap: 2vw; align-items: center; background: var(--bg-card); padding: 3vh 2vw; border-radius: 12px; border-left: 3px solid var(--accent);">
+        <div style="font-family:Georgia,serif; font-size: clamp(40px, 4vw, 60px); color: var(--accent); min-width: 80px; text-align:center;">&#x1F3A5;</div>
+        <div>
+          <h3 style="font-size: clamp(20px, 1.7vw, 28px); margin-bottom: 8px;">Live cohort sessions</h3>
+          <p style="color: var(--muted); font-size: clamp(14px, 1.15vw, 19px);">Once a week, 90 minutes. Screen-share, real building, your questions answered live. Sessions recorded for replay.</p>
+        </div>
+      </div>
+      <div class="reveal-item" style="display:flex; gap: 2vw; align-items: center; background: var(--bg-card); padding: 3vh 2vw; border-radius: 12px; border-left: 3px solid var(--accent-2);">
+        <div style="font-family:Georgia,serif; font-size: clamp(40px, 4vw, 60px); color: var(--accent-2); min-width: 80px; text-align:center;">&#x1F6E0;&#xFE0F;</div>
+        <div>
+          <h3 style="font-size: clamp(20px, 1.7vw, 28px); margin-bottom: 8px;">Hands-on labs</h3>
+          <p style="color: var(--muted); font-size: clamp(14px, 1.15vw, 19px);">Every session ends with you having <i>shipped something</i>. No "go watch this and we'll talk next week." You build during class.</p>
+        </div>
+      </div>
+      <div class="reveal-item" style="display:flex; gap: 2vw; align-items: center; background: var(--bg-card); padding: 3vh 2vw; border-radius: 12px; border-left: 3px solid #25D366;">
+        <div style="font-family:Georgia,serif; font-size: clamp(40px, 4vw, 60px); color: #25D366; min-width: 80px; text-align:center;">&#x1F4AC;</div>
+        <div>
+          <h3 style="font-size: clamp(20px, 1.7vw, 28px); margin-bottom: 8px;">WhatsApp support &mdash; through the week</h3>
+          <p style="color: var(--muted); font-size: clamp(14px, 1.15vw, 19px);">Stuck on a prompt at 11 PM? Message the group. Personal nudges, code reviews, real responses &mdash; not a bot, not a forum.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 13 — WHAT YOU'LL WALK OUT WITH ============ -->
+  <section class="slide">
+    <h2>What you'll walk out with</h2>
+    <p class="muted">Not theory. Not certificates. <span class="accent">One real automated options strategy</span>, running live, that you built yourself.</p>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5vw; margin-top: 3vh;">
+      <div class="reveal-item" style="background: var(--bg-card); padding: 2.5vh 1.5vw; border-radius: 12px; border-top: 3px solid var(--accent);">
+        <div style="color: var(--muted); font-size: clamp(11px, 0.8vw, 13px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;">Week 5</div>
+        <h3 style="color: var(--accent); font-size: clamp(17px, 1.3vw, 22px); margin-bottom: 8px;">&#x2601;&#xFE0F; Your own cloud server</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1vw, 16px); line-height: 1.45;">AWS Lightsail with a static IP whitelisted by your broker. The address your strategy lives at.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); padding: 2.5vh 1.5vw; border-radius: 12px; border-top: 3px solid var(--accent-2);">
+        <div style="color: var(--muted); font-size: clamp(11px, 0.8vw, 13px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;">Week 6</div>
+        <h3 style="color: var(--accent-2); font-size: clamp(17px, 1.3vw, 22px); margin-bottom: 8px;">&#x1F9E0; Your first strategy in code</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1vw, 16px); line-height: 1.45;">A function that takes today's market state and returns what it would sell. Your rule, in software.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); padding: 2.5vh 1.5vw; border-radius: 12px; border-top: 3px solid var(--accent);">
+        <div style="color: var(--muted); font-size: clamp(11px, 0.8vw, 13px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;">Week 7</div>
+        <h3 style="color: var(--accent); font-size: clamp(17px, 1.3vw, 22px); margin-bottom: 8px;">&#x1F4F2; Telegram bot, wired</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1vw, 16px); line-height: 1.45;">Entry, exit, end-of-day, critical alerts &mdash; your bot's voice. Four message types you trust at 3 AM.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); padding: 2.5vh 1.5vw; border-radius: 12px; border-top: 3px solid var(--accent-2);">
+        <div style="color: var(--muted); font-size: clamp(11px, 0.8vw, 13px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;">Week 8</div>
+        <h3 style="color: var(--accent-2); font-size: clamp(17px, 1.3vw, 22px); margin-bottom: 8px;">&#x1F6E1;&#xFE0F; Hard safety in code</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1vw, 16px); line-height: 1.45;">Stop-loss + position size baked into the function itself. No "I'll watch it manually" left.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); padding: 2.5vh 1.5vw; border-radius: 12px; border-top: 3px solid var(--good); box-shadow: 0 0 30px rgba(34,197,94,0.12);">
+        <div style="color: var(--good); font-size: clamp(11px, 0.8vw, 13px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;">Week 9 &mdash; Live</div>
+        <h3 style="color: var(--good); font-size: clamp(17px, 1.3vw, 22px); margin-bottom: 8px;">&#x1F4B8; One real lot, placed</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1vw, 16px); line-height: 1.45;">First live order. Watched. Squared off cleanly. The cheapest tuition you'll ever pay.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); padding: 2.5vh 1.5vw; border-radius: 12px; border-top: 3px solid var(--accent);">
+        <div style="color: var(--muted); font-size: clamp(11px, 0.8vw, 13px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;">Week 10</div>
+        <h3 style="color: var(--accent); font-size: clamp(17px, 1.3vw, 22px); margin-bottom: 8px;">&#x2699;&#xFE0F; From script to system</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1vw, 16px); line-height: 1.45;">Auto-restart, daily token refresh, pre-live audit, log rotation. It runs while you sleep.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); padding: 2.5vh 1.5vw; border-radius: 12px; border-top: 3px solid var(--accent-2);">
+        <div style="color: var(--muted); font-size: clamp(11px, 0.8vw, 13px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;">Week 11</div>
+        <h3 style="color: var(--accent-2); font-size: clamp(17px, 1.3vw, 22px); margin-bottom: 8px;">&#x1F4C8; Honest 90-day backtest</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1vw, 16px); line-height: 1.45;">Real slippage. Real brokerage. No look-ahead. The number you can actually trust.</p>
+      </div>
+      <div class="reveal-item" style="background: var(--bg-card); padding: 2.5vh 1.5vw; border-radius: 12px; border-top: 3px solid var(--accent);">
+        <div style="color: var(--muted); font-size: clamp(11px, 0.8vw, 13px); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;">Week 12</div>
+        <h3 style="color: var(--accent); font-size: clamp(17px, 1.3vw, 22px); margin-bottom: 8px;">&#x1F4CA; Your scale-up rule</h3>
+        <p style="color: var(--muted); font-size: clamp(13px, 1vw, 16px); line-height: 1.45;">Walk-forward analysis. Overfitting detection. Written rule for going from 1 lot to 10.</p>
+      </div>
+      <div class="reveal-item" style="background: rgba(167,139,250,0.08); padding: 2.5vh 1.5vw; border-radius: 12px; border: 1px solid var(--accent); display:flex; align-items:center; justify-content:center; text-align:center;">
+        <div>
+          <div style="font-family:Georgia,serif; font-size: clamp(20px, 1.8vw, 28px); color: var(--accent); font-weight: 700; line-height: 1.2;">One live<br/>strategy.</div>
+          <div style="color: var(--muted); font-size: clamp(12px, 1vw, 16px); margin-top: 10px;">Built by you.<br/>Running on your server.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-line reveal-item" style="margin-top: 3vh;">Not 4 toy projects. One system that places real orders with your real money &mdash; safely.</div>
+  </section>
+
+  <!-- ============ SLIDE 14 — EFFORT REQUIRED ============ -->
+  <section class="slide">
+    <h2>What we ask of <span class="accent">you</span></h2>
+    <p class="muted">The honest pact. Read this twice before signing up.</p>
+
+    <div style="display:flex; flex-direction: column; gap: 2vh; margin-top: 4vh;">
+      <div class="reveal-item" style="display:flex; gap: 2vw; align-items: baseline; padding: 2.5vh 2vw; background: var(--bg-card); border-radius: 10px;">
+        <div style="font-size: clamp(28px, 3vw, 44px); min-width: 70px;">&#x23F1;&#xFE0F;</div>
+        <div>
+          <h3 style="font-size: clamp(20px, 1.6vw, 26px); margin-bottom: 6px;">~5 hours per week</h3>
+          <p style="color: var(--muted); font-size: clamp(14px, 1.1vw, 18px);">90 min live session + 3&ndash;4 hours of homework. No shortcuts. No "I'll catch up next week."</p>
+        </div>
+      </div>
+      <div class="reveal-item" style="display:flex; gap: 2vw; align-items: baseline; padding: 2.5vh 2vw; background: var(--bg-card); border-radius: 10px;">
+        <div style="font-size: clamp(28px, 3vw, 44px); min-width: 70px;">&#x1F4BB;</div>
+        <div>
+          <h3 style="font-size: clamp(20px, 1.6vw, 26px); margin-bottom: 6px;">A laptop + one Claude subscription</h3>
+          <p style="color: var(--muted); font-size: clamp(14px, 1.1vw, 18px);">We'll guide you through setup in Week 1. Total tool cost: under &#x20B9;2,000/month.</p>
+        </div>
+      </div>
+      <div class="reveal-item" style="display:flex; gap: 2vw; align-items: baseline; padding: 2.5vh 2vw; background: var(--bg-card); border-radius: 10px;">
+        <div style="font-size: clamp(28px, 3vw, 44px); min-width: 70px;">&#x1F9E0;</div>
+        <div>
+          <h3 style="font-size: clamp(20px, 1.6vw, 26px); margin-bottom: 6px;">Questions, not perfection</h3>
+          <p style="color: var(--muted); font-size: clamp(14px, 1.1vw, 18px);">The dumbest question advances everyone. Show up confused &mdash; leave clear. Every week.</p>
+        </div>
+      </div>
+      <div class="reveal-item" style="display:flex; gap: 2vw; align-items: baseline; padding: 2.5vh 2vw; background: var(--bg-card); border-radius: 10px; border-left: 3px solid var(--danger);">
+        <div style="font-size: clamp(28px, 3vw, 44px); min-width: 70px;">&#x1F6AB;</div>
+        <div>
+          <h3 style="font-size: clamp(20px, 1.6vw, 26px); margin-bottom: 6px;">Show up. Do the work.</h3>
+          <p style="color: var(--muted); font-size: clamp(14px, 1.1vw, 18px);">This is not a watch-and-forget course. If you can't commit ~5 hours weekly for 12 weeks &mdash; wait for the next cohort.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 15 — WHO IT'S FOR / NOT FOR ============ -->
+  <section class="slide">
+    <h2>This course is <span class="good">for</span> you &mdash; or <span class="danger">not</span>.</h2>
+    <p class="muted">The honest filter. Be brutal with yourself.</p>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 2.5vw; margin-top: 4vh;">
+      <div class="reveal-item" style="background: rgba(34, 197, 94, 0.06); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 14px; padding: 3vh 2vw;">
+        <h3 style="color: var(--good); font-size: clamp(22px, 1.8vw, 30px); margin-bottom: 2vh;">&#x2705; This is for you if&hellip;</h3>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap: 14px;">
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--good);">&rarr;</span> You trade actively and want AI as your edge</li>
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--good);">&rarr;</span> You're willing to <i>build</i>, not just consume</li>
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--good);">&rarr;</span> You're comfortable being a beginner again</li>
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--good);">&rarr;</span> You're leaning into what's coming</li>
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--good);">&rarr;</span> You'd rather own the tools than rent them</li>
+        </ul>
+      </div>
+      <div class="reveal-item" style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 14px; padding: 3vh 2vw;">
+        <h3 style="color: var(--danger); font-size: clamp(22px, 1.8vw, 30px); margin-bottom: 2vh;">&#x274C; Skip this if&hellip;</h3>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap: 14px;">
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--danger);">&rarr;</span> You want a get-rich-quick formula</li>
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--danger);">&rarr;</span> You want pure theory or pure tips</li>
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--danger);">&rarr;</span> You want someone else to do it for you</li>
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--danger);">&rarr;</span> You're leaning away, hoping it slows down</li>
+          <li style="font-size: clamp(14px, 1.15vw, 19px); padding-left: 24px; position:relative;"><span style="position:absolute; left:0; color: var(--danger);">&rarr;</span> You can't commit ~5 hours/week</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bottom-line reveal-item">If you're nodding at the left column &mdash; you're already in.</div>
+  </section>
+
+  <!-- ============ SLIDE 16 — CLOSE (typewriter) ============ -->
+  <section class="slide close-slide" style="background:#000; align-items:center; justify-content:center; text-align:center;">
+    <div style="max-width:80vw;">
+      <h1 class="typewriter" style="font-family:Georgia,serif; font-size: clamp(60px, 8vw, 140px); line-height:1.05; letter-spacing:-0.02em; color:#fff; display:inline-block;">
+        The future is here.
+      </h1>
+      <br/>
+      <h1 class="typewriter line2" style="font-family:Georgia,serif; font-size: clamp(80px, 10vw, 180px); line-height:1; margin-top:4vh; color: var(--accent); text-shadow: 0 0 60px rgba(167,139,250,0.5); display:inline-block;">
+        Lean in.
+      </h1>
+    </div>
+  </section>
+
+</div>
+
+<div class="hint">&larr; &rarr;  navigate &middot; F  fullscreen</div>
+<div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let idx = 0;
+
+  function updateProgress() {
+    const pct = ((idx + 1) / slides.length) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  function getRevealItems(slide) {
+    return Array.from(slide.querySelectorAll('.reveal-item'));
+  }
+
+  function revealedCount(slide) {
+    return getRevealItems(slide).filter(el => el.classList.contains('revealed')).length;
+  }
+
+  function resetReveals(slide) {
+    getRevealItems(slide).forEach(el => el.classList.remove('revealed'));
+  }
+
+  function revealAll(slide) {
+    getRevealItems(slide).forEach(el => el.classList.add('revealed'));
+  }
+
+  function revealNext(slide) {
+    const items = getRevealItems(slide);
+    const next = items.find(el => !el.classList.contains('revealed'));
+    if (next) { next.classList.add('revealed'); return true; }
+    return false;
+  }
+
+  function unrevealLast(slide) {
+    const items = getRevealItems(slide);
+    const revealed = items.filter(el => el.classList.contains('revealed'));
+    if (revealed.length > 0) { revealed[revealed.length - 1].classList.remove('revealed'); return true; }
+    return false;
+  }
+
+  function show(i, direction) {
+    const prev = idx;
+    idx = (i + slides.length) % slides.length;
+    slides.forEach((s, n) => s.classList.toggle('active', n === idx));
+    updateProgress();
+
+    // Reset staged slides
+    document.querySelectorAll('.about-slide').forEach(el => el.dataset.stage = '0');
+
+    // Reset reveals on the new slide
+    const cur = slides[idx];
+    if (direction > 0) {
+      resetReveals(cur);
+    } else {
+      revealAll(cur);
+    }
+
+    // Reset typewriter animations on close slide
+    cur.querySelectorAll('.typewriter').forEach(el => {
+      el.style.animation = 'none';
+      el.offsetHeight; // trigger reflow
+      el.style.animation = '';
+    });
+  }
+
+  function tryAdvanceStage(direction) {
+    const cur = slides[idx];
+    if (!cur) return false;
+
+    // Staged slides (about-slide: 2 stages)
+    if (cur.classList.contains('about-slide')) {
+      const maxStage = 2;
+      let stage = parseInt(cur.dataset.stage || '0', 10);
+      if (direction > 0 && stage < maxStage) { cur.dataset.stage = String(stage + 1); return true; }
+      if (direction < 0 && stage > 0)        { cur.dataset.stage = String(stage - 1); return true; }
+      return false;
+    }
+
+    // Staggered reveal
+    const items = getRevealItems(cur);
+    if (items.length === 0) return false;
+
+    if (direction > 0) {
+      return revealNext(cur);
+    } else {
+      return unrevealLast(cur);
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      if (!tryAdvanceStage(+1)) show(idx + 1, +1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      if (!tryAdvanceStage(-1)) show(idx - 1, -1);
+    } else if (e.key === 'Home') show(0, +1);
+    else if (e.key === 'End') show(slides.length - 1, +1);
+    else if (e.key.toLowerCase() === 'f') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  document.addEventListener('click', () => {
+    if (!tryAdvanceStage(+1)) show(idx + 1, +1);
+  });
+
+  updateProgress();
+</script>
+
+</body>
+</html>
