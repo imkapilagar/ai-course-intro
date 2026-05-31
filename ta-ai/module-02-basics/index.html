@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Module 02 · Part A — AI Basics for the Chart-Reader · TA-AI Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300..700&family=Shippori+Mincho:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* =========================================================
+     A · LIGHT LAB
+     blueprint-paper white · deep teal-cyan accent
+     Instrument Serif italic for the moment · JetBrains Mono for chrome
+     (theme lifted verbatim from ai-in-your-ta.html)
+     ========================================================= */
+  :root{
+    --bg:#f4f6f8;
+    --panel:#ffffff;
+    --ink:#0a1119;
+    --ink-soft:#3d4856;
+    --ink-mute:#6b7785;
+    --cyan:#0094b3;
+    --cyan-deep:#006d8a;
+    --cyan-halo:#00d9ff;
+    --indigo:#5e6ad2;
+    --line:rgba(10,17,25,.14);
+    --line-strong:rgba(10,17,25,.24);
+    --cyan-soft:rgba(0,148,179,.10);
+    --cyan-border:rgba(0,148,179,.32);
+    --shadow:0 24px 60px -32px rgba(0,148,179,.45);
+    --shadow-soft:0 12px 36px -22px rgba(0,148,179,.30);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{ scroll-behavior:smooth; }
+  body{
+    height:100vh;
+    overflow-y:scroll;
+    scroll-snap-type:y mandatory;
+    scrollbar-width:none;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Geist Mono','JetBrains Mono',monospace;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::-webkit-scrollbar{ display:none; }
+
+  .deck{ position:relative; }
+
+  .slide{
+    position:relative;
+    width:100vw;
+    min-height:100vh;
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+    padding:56px 88px 64px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    background:var(--bg);
+  }
+  .slide::before{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+    background-image:
+      linear-gradient(rgba(0,148,179,.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,148,179,.07) 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image: radial-gradient(circle at 60% 40%, black 0%, transparent 80%);
+  }
+  .slide::after{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+    background:
+      radial-gradient(50vw 40vh at 85% 15%, rgba(0,217,255,.13), transparent 60%),
+      radial-gradient(40vw 50vh at 10% 100%, rgba(94,106,210,.10), transparent 60%);
+  }
+  .runner, .foot, .body{ position:relative; z-index:2; }
+
+  .runner{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-bottom:10px;
+    border-bottom:.5px solid var(--line);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+  .runner .left span{ color:var(--cyan); }
+  .runner .right b{ color:var(--ink); font-weight:600; font-size:14px; margin-right:1px; letter-spacing:.05em; }
+
+  .foot{
+    margin-top:auto;
+    display:flex; justify-content:space-between; align-items:flex-end;
+    padding-top:14px;
+    border-top:.5px solid var(--line);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+  .foot .url{ letter-spacing:.05em; text-transform:lowercase; font-size:11px; }
+  .foot .seal{ color:var(--cyan); font-family:'Shippori Mincho',serif; letter-spacing:.05em; font-size:14px; }
+
+  .body{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+
+  /* shared primitives */
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.36em; text-transform:uppercase;
+    color:var(--cyan);
+    display:inline-flex; align-items:center; gap:14px;
+  }
+  .eyebrow::before{
+    content:""; width:36px; height:1px; background:var(--cyan); display:inline-block;
+  }
+  .eyebrow.center{ justify-content:center; }
+
+  h1.display, h2.display{
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    color:var(--ink);
+  }
+  h1.display{
+    font-size:clamp(64px, 9vw, 168px);
+    line-height:.96;
+    letter-spacing:-0.025em;
+    max-width:22ch;
+  }
+  h1.display em{ color:var(--cyan); font-style:italic; }
+  h2.display{
+    font-size:clamp(48px, 6.4vw, 112px);
+    line-height:1;
+    letter-spacing:-0.025em;
+    max-width:20ch;
+  }
+  h2.display em{ color:var(--cyan); font-style:italic; }
+
+  .bottom-line{
+    margin-top:auto;
+    padding-top:40px;
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:clamp(20px, 1.7vw, 26px);
+    line-height:1.4;
+    color:var(--ink-soft);
+    max-width:56ch;
+  }
+  .bottom-line em{ color:var(--cyan); }
+
+  /* ===== COVER ===== */
+  .cover .body{ display:grid; grid-template-columns:1.15fr .85fr; gap:80px; align-items:center; }
+  .cover h1{
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    font-size:clamp(84px, 11vw, 196px);
+    line-height:.9;
+    letter-spacing:-0.03em;
+    color:var(--ink);
+    margin-top:32px;
+  }
+  .cover h1 em{ color:var(--cyan); font-style:italic; }
+  .cover h1 .stop{ color:var(--cyan); }
+  .cover .deck-lede{
+    margin-top:40px;
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:clamp(22px, 1.9vw, 30px);
+    line-height:1.4;
+    color:var(--ink-soft);
+    max-width:36ch;
+  }
+  .cover .deck-lede em{ color:var(--cyan); }
+  .cover .author{ margin-top:56px; display:flex; align-items:center; gap:20px; }
+  .cover .author .line{ width:60px; height:.5px; background:var(--cyan); }
+  .cover .author .name{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:22px; color:var(--ink);
+  }
+  .cover .author .name small{
+    display:block;
+    font-family:'JetBrains Mono',monospace; font-style:normal;
+    font-size:11px; letter-spacing:.22em;
+    color:var(--ink-mute); text-transform:uppercase; margin-top:4px;
+  }
+  .cover .panel{
+    position:relative;
+    aspect-ratio:1/1.15;
+    border:.5px solid var(--cyan-border);
+    background:rgba(255,255,255,.6);
+    padding:24px;
+    box-shadow:var(--shadow);
+  }
+  .cover .panel::before{
+    content:"SYS · LLM · v.0";
+    position:absolute; top:10px; left:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:9px; letter-spacing:.32em; color:var(--cyan);
+  }
+  .cover .panel::after{
+    content:"● ● ●";
+    position:absolute; top:10px; right:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:9px; letter-spacing:.22em; color:rgba(0,148,179,.6);
+  }
+  .cover .panel svg{ width:100%; height:100%; display:block; margin-top:16px; }
+
+  /* ===== STATEMENT (slides 2, 3, 12, 16) ===== */
+  .statement .body{ justify-content:center; }
+  .statement .roman{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px; letter-spacing:.36em; text-transform:uppercase;
+    color:var(--cyan);
+    margin-bottom:32px;
+  }
+  .statement h1{
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    font-size:clamp(64px, 9vw, 168px);
+    line-height:.96;
+    letter-spacing:-0.025em;
+    color:var(--ink);
+    max-width:22ch;
+  }
+  .statement h1 em{ color:var(--cyan); font-style:italic; }
+
+  /* ===== CUTOFF (slide 4) — single hero card ===== */
+  .cutoff .body{ display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+  .cutoff .left{ border-left:2px solid var(--cyan); padding-left:36px; }
+  .cutoff .left .who{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .cutoff .left h2{
+    margin-top:14px;
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    font-size:clamp(48px, 5.6vw, 88px);
+    line-height:1;
+    letter-spacing:-0.025em;
+    color:var(--ink);
+  }
+  .cutoff .left h2 em{ color:var(--cyan); font-style:italic; }
+  .cutoff .left p{
+    margin-top:20px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:18px; line-height:1.55;
+    color:var(--ink-soft); max-width:42ch;
+  }
+  .cutoff .left p b{ color:var(--ink); font-weight:500; font-style:normal; }
+  .cutoff .timeline{
+    background:rgba(255,255,255,.6);
+    border:.5px solid var(--cyan-border);
+    padding:32px;
+    position:relative;
+    box-shadow:var(--shadow-soft);
+  }
+  .cutoff .timeline::before{
+    content:"SYS · CUTOFF"; position:absolute; top:10px; left:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:9px; letter-spacing:.32em; color:var(--cyan);
+  }
+  .cutoff .tl-line{
+    margin-top:24px;
+    position:relative;
+    height:2px;
+    background:var(--cyan-border);
+  }
+  .cutoff .tl-line::after{
+    content:""; position:absolute; left:0; top:0;
+    width:62%; height:2px; background:var(--cyan);
+  }
+  .cutoff .tl-marks{
+    margin-top:14px;
+    display:grid; grid-template-columns:repeat(3,1fr);
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+  .cutoff .tl-marks span:nth-child(2){ text-align:center; color:var(--cyan); }
+  .cutoff .tl-marks span:nth-child(3){ text-align:right; }
+  .cutoff .tl-rows{
+    margin-top:30px;
+    display:grid; gap:14px;
+  }
+  .cutoff .tl-row{
+    display:grid; grid-template-columns:120px 1fr;
+    gap:18px; align-items:baseline;
+    padding-bottom:12px;
+    border-bottom:.5px solid var(--line);
+  }
+  .cutoff .tl-row:last-child{ border-bottom:none; }
+  .cutoff .tl-row .when{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .cutoff .tl-row .what{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:16px; line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .cutoff .tl-row .what b{ color:var(--ink); font-weight:500; font-style:normal; }
+
+  /* ===== FORK (slide 5 — search vs conversation) ===== */
+  .fork .body{ display:grid; grid-template-rows:auto 1fr auto; gap:32px; }
+  .fork .paths{ display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:stretch; }
+  .fork .path{
+    background:rgba(255,255,255,.4);
+    border:.5px solid var(--line-strong);
+    padding:32px 32px 28px;
+    display:flex; flex-direction:column;
+    position:relative;
+  }
+  .fork .path.right{
+    background:rgba(0,148,179,.05);
+    border-color:var(--cyan-border);
+  }
+  .fork .path .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+  .fork .path.right .tag{ color:var(--cyan); }
+  .fork .path h3{
+    margin-top:12px;
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    font-size:36px; line-height:1.1; letter-spacing:-0.02em;
+    color:var(--ink);
+  }
+  .fork .path h3 em{ font-style:italic; color:var(--cyan); }
+  .fork .path .traits{
+    margin-top:auto;
+    padding-top:24px;
+    border-top:.5px solid var(--line);
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .fork .path .traits div{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:16px;
+    color:var(--ink-soft);
+    display:grid; grid-template-columns:18px 1fr; gap:10px;
+  }
+  .fork .path .traits div span{
+    color:var(--cyan); font-family:'JetBrains Mono',monospace;
+    font-style:normal; font-size:13px;
+  }
+  .fork .punchline{
+    font-family:'Instrument Serif',serif;
+    font-style:italic; font-weight:400;
+    font-size:clamp(22px, 2.2vw, 32px);
+    color:var(--ink); text-align:center;
+    border-top:.5px solid var(--line);
+    padding-top:24px;
+  }
+  .fork .punchline em{ color:var(--cyan); }
+
+  /* ===== PROMPTS (slides 6, 14 — two-col compare) ===== */
+  .prompts .body{ display:grid; grid-template-rows:auto 1fr; gap:32px; }
+  .prompts .pair{ display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:stretch; }
+  .prompt-box{
+    background:rgba(255,255,255,.6);
+    border:.5px solid var(--line-strong);
+    padding:28px;
+    display:flex; flex-direction:column;
+    position:relative;
+  }
+  .prompt-box.bad{ background:rgba(255,255,255,.3); border-style:dashed; }
+  .prompt-box.good{
+    background:rgba(255,255,255,.7);
+    border-color:var(--cyan-border);
+    box-shadow:var(--shadow-soft);
+  }
+  .prompt-box .label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+  .prompt-box.good .label{ color:var(--cyan); }
+  .prompt-box.good .label::before{ content:"› "; }
+  .prompt-box.bad .label::before{ content:"× "; }
+  .prompt-box pre{
+    margin-top:18px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13.5px; line-height:1.65;
+    color:var(--ink);
+    white-space:pre-wrap; word-break:break-word;
+  }
+  .prompt-box pre .key{ color:var(--cyan); font-weight:600; }
+  .prompt-box pre .var{ color:var(--cyan-deep); font-style:italic; }
+  .prompt-box pre .cmt{ color:var(--ink-mute); font-style:italic; }
+  .prompt-box .note{
+    margin-top:18px; padding-top:14px;
+    border-top:.5px solid var(--line);
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:15px; line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .prompt-box .note b{ color:var(--ink); font-weight:500; font-style:normal; }
+
+  /* ===== CONTEXT (slide 7 — working memory metaphor) ===== */
+  .context .body{ display:grid; grid-template-columns:1fr 1.15fr; gap:48px; align-items:stretch; }
+  .context .left{ display:flex; flex-direction:column; }
+  .context .left h2{ margin-top:18px; }
+  .context .blurb{
+    margin-top:24px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:20px; line-height:1.5;
+    color:var(--ink-soft); max-width:38ch;
+  }
+  .context .blurb b{ color:var(--ink); font-weight:500; font-style:normal; }
+  .context .annot{
+    margin-top:auto; padding-top:24px;
+    border-top:.5px solid var(--line);
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .context .annot div{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:16px; color:var(--ink-soft);
+    display:grid; grid-template-columns:120px 1fr; gap:14px;
+  }
+  .context .annot div span{
+    font-family:'JetBrains Mono',monospace; font-style:normal;
+    font-size:10.5px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .desk{
+    background:rgba(255,255,255,.7);
+    border:.5px solid var(--cyan-border);
+    padding:32px;
+    display:flex; flex-direction:column;
+    box-shadow:var(--shadow-soft);
+    position:relative;
+  }
+  .desk::before{
+    content:"DESK · SCOPE"; position:absolute; top:10px; left:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:9px; letter-spacing:.32em; color:var(--cyan);
+  }
+  .desk .head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-bottom:14px;
+    border-bottom:.5px solid var(--line);
+  }
+  .desk .head .who{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .desk .head .meta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+  .desk .rows{ margin-top:20px; display:grid; gap:12px; }
+  .desk .row{
+    display:grid; grid-template-columns:160px 1fr;
+    gap:18px; align-items:baseline;
+  }
+  .desk .row .k{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .desk .row .v{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:17px; line-height:1.45;
+    color:var(--ink);
+  }
+  .desk .row .v b{ color:var(--ink); font-weight:500; font-style:normal; }
+  .desk .row .v small{ display:block; font-size:13.5px; color:var(--ink-mute); margin-top:2px; }
+  .desk .outside{
+    margin-top:22px; padding-top:18px;
+    border-top:.5px dashed var(--line-strong);
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:15.5px;
+    color:var(--ink-mute);
+  }
+  .desk .outside b{ color:var(--cyan); font-weight:500; font-style:normal; }
+
+  /* ===== TOKENS (slide 8 — numeric breather) ===== */
+  .tokens .body{ display:grid; grid-template-rows:auto 1fr; gap:40px; }
+  .tokens .stat-row{
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:var(--cyan-border);
+    border:.5px solid var(--cyan-border);
+  }
+  .tokens .stat{
+    background:rgba(255,255,255,.55);
+    padding:36px 32px;
+    display:flex; flex-direction:column;
+  }
+  .tokens .stat .step{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .tokens .stat .num{
+    margin-top:18px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-weight:400;
+    font-size:88px; line-height:.9;
+    color:var(--cyan);
+    letter-spacing:-0.025em;
+  }
+  .tokens .stat .num small{ font-size:24px; color:var(--ink-mute); font-style:normal; margin-left:6px; }
+  .tokens .stat h4{
+    margin-top:18px;
+    font-family:'Instrument Serif',serif;
+    font-weight:400; font-style:italic;
+    font-size:22px; line-height:1.2;
+    color:var(--ink);
+  }
+  .tokens .stat p{
+    margin-top:auto; padding-top:18px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:15.5px; line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .tokens .calc{
+    margin-top:8px;
+    background:rgba(255,255,255,.6);
+    border:.5px solid var(--cyan-border);
+    padding:22px 28px;
+    display:grid; grid-template-columns:auto 1fr auto;
+    gap:24px; align-items:center;
+  }
+  .tokens .calc .pre{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .tokens .calc .eq{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:22px;
+    color:var(--ink);
+  }
+  .tokens .calc .eq b{ color:var(--cyan); font-weight:500; }
+  .tokens .calc .pin{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+
+  /* ===== CANNOT (slide 9 — hallucination cards) ===== */
+  .cannot .body{ display:grid; grid-template-rows:auto 1fr; gap:40px; }
+  .cannot .cards{
+    display:grid; grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background:var(--cyan-border);
+    border:.5px solid var(--cyan-border);
+  }
+  .cannot .card{
+    background:rgba(255,255,255,.55);
+    padding:28px 26px;
+    display:flex; flex-direction:column;
+    min-height:300px;
+  }
+  .cannot .card .num{
+    font-family:'Instrument Serif',serif;
+    font-style:italic; font-weight:400;
+    font-size:64px;
+    line-height:.85;
+    color:var(--cyan);
+  }
+  .cannot .card h4{
+    margin-top:20px;
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    font-style:italic;
+    font-size:24px;
+    line-height:1.15;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+  }
+  .cannot .card p{
+    margin-top:auto; padding-top:18px;
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:15.5px; line-height:1.5;
+    color:var(--ink-soft);
+  }
+
+  /* ===== OUTCOMES (slides 10, 11 — 2x2) ===== */
+  .outcomes .body{ display:grid; grid-template-rows:auto 1fr; gap:36px; }
+  .outcomes .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    grid-template-rows:repeat(2,1fr);
+    gap:1px;
+    background:var(--cyan-border);
+    border:.5px solid var(--cyan-border);
+  }
+  .outcomes .cell{
+    background:rgba(255,255,255,.55);
+    padding:32px 32px;
+    display:flex; flex-direction:column;
+  }
+  .outcomes .cell .step{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .outcomes .cell h4{
+    margin-top:14px;
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    font-size:30px; line-height:1.1;
+    letter-spacing:-0.015em;
+    color:var(--ink);
+  }
+  .outcomes .cell h4 em{ color:var(--cyan); font-style:italic; }
+  .outcomes .cell p{
+    margin-top:auto; padding-top:20px;
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:16px; line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .outcomes .cell.warn{ background:rgba(255,255,255,.35); }
+  .outcomes .cell.warn h4{ color:var(--ink-soft); }
+
+  /* ===== TRIO (slides 13, 15 — 3 cards) ===== */
+  .trio .body{ display:grid; grid-template-rows:auto 1fr; gap:36px; }
+  .trio .three{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; align-items:stretch; }
+  .trio .card{
+    background:rgba(255,255,255,.55);
+    border:.5px solid var(--cyan-border);
+    padding:32px 28px;
+    display:flex; flex-direction:column;
+    position:relative;
+  }
+  .trio .card .num{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-weight:400;
+    font-size:96px; line-height:.82;
+    color:var(--cyan);
+    letter-spacing:-0.04em;
+  }
+  .trio .card h4{
+    margin-top:18px;
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    font-size:28px; line-height:1.15;
+    letter-spacing:-0.015em;
+    color:var(--ink);
+  }
+  .trio .card h4 em{ color:var(--cyan); font-style:italic; }
+  .trio .card p{
+    margin-top:14px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:15.5px; line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .trio .card .tag{
+    margin-top:auto; padding-top:18px;
+    border-top:.5px solid var(--line);
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+  .trio .card .tag b{ color:var(--cyan); font-weight:600; }
+
+  /* ===== NEXT (slide 17 — transition) ===== */
+  .next .body{ display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+  .next .left h2{
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    font-size:clamp(48px, 6vw, 96px);
+    line-height:.98;
+    letter-spacing:-0.025em;
+    color:var(--ink);
+  }
+  .next .left h2 em{ color:var(--cyan); font-style:italic; }
+  .next .left p{
+    margin-top:24px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:18px; line-height:1.55;
+    color:var(--ink-soft); max-width:38ch;
+  }
+  .next .left p b{ color:var(--ink); font-weight:500; font-style:normal; }
+  .next .arrow{
+    margin-top:32px;
+    display:flex; align-items:center; gap:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .next .arrow span{ width:48px; height:.5px; background:var(--cyan); display:inline-block; }
+  .next .card{
+    background:rgba(255,255,255,.6);
+    border:.5px solid var(--cyan-border);
+    padding:40px 36px;
+    position:relative;
+    box-shadow:var(--shadow);
+  }
+  .next .card::before{
+    content:"SYS · MODULE · ii.b"; position:absolute; top:10px; left:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:9px; letter-spacing:.32em; color:var(--cyan);
+  }
+  .next .card .tag{
+    margin-top:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .next .card h3{
+    margin-top:14px;
+    font-family:'Instrument Serif',serif;
+    font-weight:400;
+    font-size:38px; line-height:1.1;
+    letter-spacing:-0.02em;
+    color:var(--ink);
+  }
+  .next .card h3 em{ color:var(--cyan); font-style:italic; }
+  .next .card ul{
+    margin-top:28px;
+    list-style:none;
+    border-top:.5px solid var(--line);
+  }
+  .next .card ul li{
+    border-bottom:.5px solid var(--line);
+    padding:12px 0;
+    display:grid; grid-template-columns:30px 1fr; gap:14px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:16px; line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .next .card ul li span{
+    font-family:'JetBrains Mono',monospace; font-style:normal;
+    font-size:10.5px; letter-spacing:.16em;
+    color:var(--cyan); padding-top:3px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width:980px){
+    .slide{ padding:40px 32px 48px; }
+    .cover .body, .fork .paths, .cannot .cards,
+    .outcomes .grid, .prompts .pair, .context .body,
+    .trio .three, .cutoff .body, .next .body, .tokens .stat-row{
+      grid-template-columns:1fr !important;
+      grid-template-rows:auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ====================================================== 01 / COVER -->
+<section class="slide cover">
+  <div class="runner">
+    <div class="left">TA-AI · <span>MODULE 02 · PART A</span></div>
+    <div class="right">Slide <b>01</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">II.A · AI, the basics</div>
+      <h1>AI, the <em>basics</em><span class="stop">.</span></h1>
+      <p class="deck-lede">For the chart-reader. <em>Before AI meets your TA, meet the AI.</em></p>
+      <div class="author">
+        <div class="line"></div>
+        <div class="name">Kapil Agarwal<small>TA-AI Mentorship · 2026</small></div>
+      </div>
+    </div>
+    <div class="panel">
+      <svg viewBox="0 0 400 480">
+        <defs>
+          <pattern id="cv-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M20 0H0V20" fill="none" stroke="rgba(0,148,179,.18)" stroke-width=".5"/>
+          </pattern>
+        </defs>
+        <rect width="400" height="480" fill="url(#cv-grid)"/>
+        <!-- tokens flowing into a node -->
+        <g font-family="JetBrains Mono,monospace" font-size="10" fill="#006d8a" letter-spacing="2">
+          <text x="40" y="120">the</text>
+          <text x="40" y="160">market</text>
+          <text x="40" y="200">opened</text>
+          <text x="40" y="240">on</text>
+          <text x="40" y="280">a</text>
+          <text x="40" y="320">strong</text>
+          <text x="40" y="360">___</text>
+        </g>
+        <path d="M120 120 L260 240 M120 160 L260 240 M120 200 L260 240 M120 240 L260 240 M120 280 L260 240 M120 320 L260 240 M120 360 L260 240"
+              fill="none" stroke="rgba(0,148,179,.4)" stroke-width=".5"/>
+        <g transform="translate(280,210)">
+          <circle r="42" fill="none" stroke="#0094b3" stroke-width="1" stroke-dasharray="2 3"/>
+          <circle r="26" fill="none" stroke="#0094b3" stroke-width=".5"/>
+          <text x="0" y="6" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#0094b3" letter-spacing="2">LLM</text>
+        </g>
+        <path d="M320 240 L360 240" fill="none" stroke="#0094b3" stroke-width="1"/>
+        <text x="365" y="244" font-family="Instrument Serif,serif" font-style="italic" font-size="22" fill="#0a1119">note</text>
+      </svg>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics</div>
+    <div class="seal">基</div>
+  </div>
+</section>
+
+<!-- ====================================================== 02 / STATEMENT — next-word -->
+<section class="slide statement">
+  <div class="runner">
+    <div class="left">FOUNDATION · <span>What an LLM does</span></div>
+    <div class="right">Slide <b>02</b> / 17</div>
+  </div>
+  <div class="body">
+    <div class="roman">i · The autocomplete that read the internet</div>
+    <h1>It does <em>one thing</em> — guesses the <em>next word</em>.</h1>
+    <p class="bottom-line">Every sentence Claude produces is <em>one token at a time</em>, choosing what is most likely to come next based on everything that came before. No reasoning engine. No database lookup. Just a very, <em>very</em> well-read predictor of the next word.</p>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §i</div>
+    <div class="seal">字</div>
+  </div>
+</section>
+
+<!-- ====================================================== 03 / STATEMENT — intern -->
+<section class="slide statement">
+  <div class="runner">
+    <div class="left">FOUNDATION · <span>The intern metaphor</span></div>
+    <div class="right">Slide <b>03</b> / 17</div>
+  </div>
+  <div class="body">
+    <div class="roman">ii · The intern who read everything</div>
+    <h1>Read <em>every book</em>. Lived <em>none</em> of them.</h1>
+    <p class="bottom-line">Claude has read more about technical analysis than any human alive — every Murphy chapter, every Wyckoff page, every blog post on the doji. It has <em>never lost ₹50,000 on a 3-PM SL hit</em>. Never had a real lot on the line. Brilliant intern, zero skin in the game. Always remember which seat you're in.</p>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §ii</div>
+    <div class="seal">読</div>
+  </div>
+</section>
+
+<!-- ====================================================== 04 / CUTOFF -->
+<section class="slide cutoff">
+  <div class="runner">
+    <div class="left">FOUNDATION · <span>Knowledge cutoff</span></div>
+    <div class="right">Slide <b>04</b> / 17</div>
+  </div>
+  <div class="body">
+    <div class="left">
+      <div class="who">iii · Trained once · Answers forever</div>
+      <h2>It does <em>not</em> know <em>today</em>.</h2>
+      <p>The model was trained on data up to a certain date — its <b>knowledge cutoff</b>. After that, the world kept moving but the model didn't. <b>Today's NIFTY close, this morning's RBI rate decision, the result the company posted at 3:45 PM</b> — none of it is inside the model. If you want it in the answer, <b>you</b> have to put it in the prompt.</p>
+    </div>
+    <div class="timeline">
+      <div class="who" style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.26em;text-transform:uppercase;">Inside the model</div>
+      <div class="tl-line"></div>
+      <div class="tl-marks">
+        <span>2010</span><span>Cutoff · Jan 2026</span><span>Today</span>
+      </div>
+      <div class="tl-rows">
+        <div class="tl-row">
+          <div class="when">Inside</div>
+          <div class="what"><b>Wyckoff phases.</b> Every doji ever written about. The 2020 covid crash. Every Murphy chapter.</div>
+        </div>
+        <div class="tl-row">
+          <div class="when">Inside</div>
+          <div class="what"><b>NIFTY's history</b> through late 2025. Every annual report up to FY24.</div>
+        </div>
+        <div class="tl-row">
+          <div class="when">Outside</div>
+          <div class="what">Today's open. <b>This morning's news.</b> The rate cut announced at 11:30 AM. The price you're staring at right now.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §iii</div>
+    <div class="seal">時</div>
+  </div>
+</section>
+
+<!-- ====================================================== 05 / FORK — search vs conversation -->
+<section class="slide fork">
+  <div class="runner">
+    <div class="left">FOUNDATION · <span>How you use it</span></div>
+    <div class="right">Slide <b>05</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">iv · A conversation, not a search</div>
+      <h2 class="display" style="margin-top:18px;">Don't search. <em>Talk.</em></h2>
+    </div>
+    <div class="paths">
+      <div class="path">
+        <div class="tag">Path A · Search habit</div>
+        <h3>Type once. Read once. Give up.</h3>
+        <div class="traits">
+          <div><span>›</span>One-shot question, hope for gold.</div>
+          <div><span>›</span>First answer doesn't fit → close tab.</div>
+          <div><span>›</span>No follow-up, no refinement.</div>
+          <div><span>›</span>Treats AI like a slot machine.</div>
+        </div>
+      </div>
+      <div class="path right">
+        <div class="tag">Path B · Conversation habit</div>
+        <h3>Refine in <em>turns</em>. Push back. Reshape.</h3>
+        <div class="traits">
+          <div><span>›</span>"That's not what I meant — try again, this time…"</div>
+          <div><span>›</span>Adds context piece by piece.</div>
+          <div><span>›</span>Asks <em>why</em>, asks for sources, asks for the counter.</div>
+          <div><span>›</span>Treats AI like a junior analyst at a desk.</div>
+        </div>
+      </div>
+    </div>
+    <div class="punchline">The first answer is the <em>worst</em> answer. The fifth is usually the one worth keeping.</div>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §iv</div>
+    <div class="seal">話</div>
+  </div>
+</section>
+
+<!-- ====================================================== 06 / PROMPTS — fuzzy vs precise -->
+<section class="slide prompts">
+  <div class="runner">
+    <div class="left">BEHAVIOR · <span>Prompt = question + setup</span></div>
+    <div class="right">Slide <b>06</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">v · Garbage in, confident garbage out</div>
+      <h2 class="display" style="margin-top:18px;">The prompt <em>is</em> the work.</h2>
+    </div>
+    <div class="pair">
+      <div class="prompt-box bad">
+        <div class="label">Fuzzy prompt</div>
+<pre><span class="cmt">// what most people type</span>
+<span class="key">Hey Claude</span>, is this chart
+looking good?</pre>
+        <div class="note">No instrument. No timeframe. No criteria. Claude will guess what you want — and answer <b>confidently</b>. Confidence ≠ correctness.</div>
+      </div>
+      <div class="prompt-box good">
+        <div class="label">Precise prompt</div>
+<pre><span class="cmt">// the prompt that earns its answer</span>
+<span class="key">Role:</span> <span class="var">Strict Dow theorist.</span>
+<span class="key">Chart:</span> NIFTY · 1-hour · last 60 bars (attached).
+<span class="key">Task:</span> Label the phase using Dow tenets 4 + 5.
+       Cite the bar that confirms.
+<span class="key">If unclear:</span> say so. Don't fabricate.</pre>
+        <div class="note"><b>Role + Context + Task + Honesty clause.</b> Same model, same chart — completely different answer.</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §v</div>
+    <div class="seal">問</div>
+  </div>
+</section>
+
+<!-- ====================================================== 07 / CONTEXT — working memory -->
+<section class="slide context">
+  <div class="runner">
+    <div class="left">BEHAVIOR · <span>Context window</span></div>
+    <div class="right">Slide <b>07</b> / 17</div>
+  </div>
+  <div class="body">
+    <div class="left">
+      <div class="eyebrow">vi · The desk it works on</div>
+      <h2 class="display">Working memory, <em>not</em> the library.</h2>
+      <p class="blurb">The model's <b>context window</b> is everything currently on its desk — the prompt, the chart you uploaded, the prior turns of this chat. If it isn't on the desk, it isn't in the answer. The library (its training) is in another room.</p>
+      <div class="annot">
+        <div><span>Rule of thumb</span>Paste it · upload it · or it didn't happen.</div>
+        <div><span>Why it matters</span>"Last week we discussed…" — not in a new chat, it didn't.</div>
+      </div>
+    </div>
+    <div class="desk">
+      <div class="head">
+        <div class="who">On the desk right now</div>
+        <div class="meta">CHAT · 14:22 IST</div>
+      </div>
+      <div class="rows">
+        <div class="row">
+          <div class="k">System</div>
+          <div class="v"><b>You are a strict Dow theorist.</b><small>Role established by user.</small></div>
+        </div>
+        <div class="row">
+          <div class="k">User · turn 1</div>
+          <div class="v"><b>NIFTY hourly, 60 bars.</b><small>Image attached · 412 KB.</small></div>
+        </div>
+        <div class="row">
+          <div class="k">Assistant · turn 1</div>
+          <div class="v">"Accumulation, bar 41 confirms…"</div>
+        </div>
+        <div class="row">
+          <div class="k">User · turn 2</div>
+          <div class="v"><b>Re-check with tenets 4 + 5 only.</b></div>
+        </div>
+      </div>
+      <div class="outside"><b>Outside the desk:</b> yesterday's chat · your other Claude conversation · the chart you forgot to upload · today's live price.</div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §vi</div>
+    <div class="seal">視</div>
+  </div>
+</section>
+
+<!-- ====================================================== 08 / TOKENS -->
+<section class="slide tokens">
+  <div class="runner">
+    <div class="left">BEHAVIOR · <span>Tokens — what you're billed on</span></div>
+    <div class="right">Slide <b>08</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">vii · The unit of work</div>
+      <h2 class="display" style="margin-top:18px;">Words aren't free. <em>Tokens</em> are the meter.</h2>
+    </div>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="step">i · The unit</div>
+        <div class="num">≈1.3<small>tokens/word</small></div>
+        <h4>A token is roughly a word-piece.</h4>
+        <p>"Trading" might be one token. "Disinflation" is split into three. English averages ~1.3 tokens per word.</p>
+      </div>
+      <div class="stat">
+        <div class="step">ii · The bill</div>
+        <div class="num">In + Out</div>
+        <h4>You're charged on both ends.</h4>
+        <p>What you send (prompt + uploads + chat history) <b>plus</b> what the model writes back. A long chart-analysis chat is not free — even on Claude.ai.</p>
+      </div>
+      <div class="stat">
+        <div class="step">iii · The ceiling</div>
+        <div class="num">200K<small>typical</small></div>
+        <h4>Each chat has a context budget.</h4>
+        <p>Cross it and old turns silently drop off the desk. "It used to know that" — yes, until the context filled up.</p>
+      </div>
+    </div>
+    <div class="calc">
+      <div class="pre">Quick math</div>
+      <div class="eq">A 10-page PDF you upload ≈ <b>~5,000 tokens</b>. Your 2-hour TA chat ≈ <b>~15,000 tokens</b>. Comfortable headroom — until you keep adding charts.</div>
+      <div class="pin">~1.3 × words</div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §vii</div>
+    <div class="seal">数</div>
+  </div>
+</section>
+
+<!-- ====================================================== 09 / CANNOT — hallucination -->
+<section class="slide cannot">
+  <div class="runner">
+    <div class="left">BEHAVIOR · <span>Hallucination</span></div>
+    <div class="right">Slide <b>09</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">viii · Confidently wrong</div>
+      <h2 class="display" style="margin-top:18px;">When it doesn't know, it <em>guesses</em> — without telling you.</h2>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="num">i</div>
+        <h4>Invented citations</h4>
+        <p>"Per Murphy, page 187…" — page doesn't exist. Sounds authoritative. Often isn't.</p>
+      </div>
+      <div class="card">
+        <div class="num">ii</div>
+        <h4>Fabricated numbers</h4>
+        <p>"NIFTY closed at 24,832 on Mar 14, 2024…" — could be off by 500 points. No flag.</p>
+      </div>
+      <div class="card">
+        <div class="num">iii</div>
+        <h4>Phantom patterns</h4>
+        <p>Asked "is this a head &amp; shoulders?" — it will <em>find</em> one. Pattern-matching to please you.</p>
+      </div>
+      <div class="card">
+        <div class="num">iv</div>
+        <h4>Made-up APIs</h4>
+        <p>Writes Python code that calls <code>yfinance.get_nifty_options()</code>. That function doesn't exist. The code looks real.</p>
+      </div>
+    </div>
+    <p class="bottom-line" style="text-align:center;max-width:64ch;margin-left:auto;margin-right:auto;">Hallucination is not a bug — it's the same next-word machine doing its job when the truthful next-word isn't in reach. <em>Verify the load-bearing claim.</em> Always.</p>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §viii</div>
+    <div class="seal">幻</div>
+  </div>
+</section>
+
+<!-- ====================================================== 10 / OUTCOMES — temperature -->
+<section class="slide outcomes">
+  <div class="runner">
+    <div class="left">BEHAVIOR · <span>Temperature &amp; randomness</span></div>
+    <div class="right">Slide <b>10</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">ix · Same question, four answers</div>
+      <h2 class="display" style="margin-top:18px;">It's <em>not</em> a database.</h2>
+    </div>
+    <div class="grid">
+      <div class="cell">
+        <div class="step">Run 01</div>
+        <h4>"<em>Accumulation</em> — bar 41 confirms."</h4>
+        <p>Confident. Cites a bar. Maps to Wyckoff phase 1.</p>
+      </div>
+      <div class="cell">
+        <div class="step">Run 02</div>
+        <h4>"<em>Markup phase</em>, momentum solid."</h4>
+        <p>Same chart. Different label. Same model. Different roll of the dice.</p>
+      </div>
+      <div class="cell">
+        <div class="step">Run 03</div>
+        <h4>"<em>Re-accumulation</em> within an uptrend."</h4>
+        <p>A hedge of the prior two. Sounds smart. Means almost nothing.</p>
+      </div>
+      <div class="cell warn">
+        <div class="step">Run 04</div>
+        <h4>"<em>Unclear</em> — need more context."</h4>
+        <p>The honest one. Rarest. Reward this answer when it shows up.</p>
+      </div>
+    </div>
+    <p class="bottom-line" style="text-align:center;max-width:62ch;margin-left:auto;margin-right:auto;">Ask the same thing twice, get two answers. <em>Temperature</em> is the dial that controls how random. Useful for brainstorming. Dangerous for decisions. Always run twice on the calls that matter.</p>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §ix</div>
+    <div class="seal">偶</div>
+  </div>
+</section>
+
+<!-- ====================================================== 11 / OUTCOMES — math vs language -->
+<section class="slide outcomes">
+  <div class="runner">
+    <div class="left">REALITY · <span>Bad at math, good at language</span></div>
+    <div class="right">Slide <b>11</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">x · Capability map</div>
+      <h2 class="display" style="margin-top:18px;">Use it for <em>words</em>. Use a sheet for <em>numbers</em>.</h2>
+    </div>
+    <div class="grid">
+      <div class="cell">
+        <div class="step">✓ Strong</div>
+        <h4>Naming the <em>pattern</em></h4>
+        <p>Bull-flag · doji · failed breakout · phase. Language-shaped tasks are the home turf.</p>
+      </div>
+      <div class="cell">
+        <div class="step">✓ Strong</div>
+        <h4>Reading the <em>story</em></h4>
+        <p>"What's the narrative this chart is telling?" — summaries, bias-spotting in a journal, postmortems.</p>
+      </div>
+      <div class="cell warn">
+        <div class="step">× Weak (raw)</div>
+        <h4>Multi-step <em>arithmetic</em></h4>
+        <p>"P&amp;L = (254.75 − 238.50) × 75 × 3 lots" — confident, often wrong. Decimals slip. Margin math slips.</p>
+      </div>
+      <div class="cell warn">
+        <div class="step">× Weak (raw)</div>
+        <h4>Percentage <em>chains</em></h4>
+        <p>"7.4% of ₹2.38L on a ₹14L portfolio drawn-down 12%…" — sounds computed, often guessed.</p>
+      </div>
+    </div>
+    <p class="bottom-line" style="text-align:center;max-width:66ch;margin-left:auto;margin-right:auto;"><em>Nuance:</em> Claude.ai and ChatGPT can now write &amp; run Python on the fly — math becomes reliable. Rule: <em>the model alone is bad at math; the model + calculator is fine.</em> Always ask: is it computing, or guessing-that-looks-like-computing?</p>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §x</div>
+    <div class="seal">算</div>
+  </div>
+</section>
+
+<!-- ====================================================== 12 / STATEMENT — doesn't see your screen -->
+<section class="slide statement">
+  <div class="runner">
+    <div class="left">REALITY · <span>What it can &amp; can't see</span></div>
+    <div class="right">Slide <b>12</b> / 17</div>
+  </div>
+  <div class="body">
+    <div class="roman">xi · The blind partner at the desk</div>
+    <h1>It does <em>not</em> see your screen.</h1>
+    <p class="bottom-line">It sees what you <em>paste</em>. It sees what you <em>upload</em>. It does <em>not</em> see your terminal, your TradingView tab, your Sensibull positions, the WhatsApp message from your broker. Treat AI like a partner sitting in another city on a voice call — you have to describe the chart for it to help with the chart. <em>If it's not in the message, it's not in the model.</em></p>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §xi</div>
+    <div class="seal">盲</div>
+  </div>
+</section>
+
+<!-- ====================================================== 13 / TRIO — multimodal -->
+<section class="slide trio">
+  <div class="runner">
+    <div class="left">REALITY · <span>Multimodal in 2026</span></div>
+    <div class="right">Slide <b>13</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">xii · Three ways to feed it</div>
+      <h2 class="display" style="margin-top:18px;">It reads <em>more</em> than text now.</h2>
+    </div>
+    <div class="three">
+      <div class="card">
+        <div class="num">i</div>
+        <h4>The <em>chart</em></h4>
+        <p>Screenshot from TradingView. Drag, drop, ask. "Label the Dow phase on this NIFTY hourly." It can see the candles.</p>
+        <div class="tag">format · <b>PNG · JPG</b></div>
+      </div>
+      <div class="card">
+        <div class="num">ii</div>
+        <h4>The <em>PDF</em></h4>
+        <p>Annual report. Result PDF. Broker margin policy doc. Drop it in, ask "what changed in capex guidance year-over-year."</p>
+        <div class="tag">format · <b>PDF up to ~32MB</b></div>
+      </div>
+      <div class="card">
+        <div class="num">iii</div>
+        <h4>The <em>CSV</em></h4>
+        <p>Your trade journal. Your option-chain dump. "Find every trade where I exited within 5 minutes of a 1% drawdown." Pattern-spotting at scale.</p>
+        <div class="tag">format · <b>CSV · XLSX · TXT</b></div>
+      </div>
+    </div>
+    <p class="bottom-line" style="text-align:center;max-width:60ch;margin-left:auto;margin-right:auto;">In 2026, "AI for traders" is <em>not</em> a text-only conversation. The chart, the journal, the document — all go in the same chat.</p>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §xii</div>
+    <div class="seal">多</div>
+  </div>
+</section>
+
+<!-- ====================================================== 14 / PROMPTS — free vs paid -->
+<section class="slide prompts">
+  <div class="runner">
+    <div class="left">REALITY · <span>Free vs paid</span></div>
+    <div class="right">Slide <b>14</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">xiii · When the upgrade earns itself</div>
+      <h2 class="display" style="margin-top:18px;">Free works. <em>Pro</em> earns itself.</h2>
+    </div>
+    <div class="pair">
+      <div class="prompt-box bad">
+        <div class="label">Free tier · Claude.ai / ChatGPT</div>
+<pre><span class="cmt">// what you get without paying</span>
+<span class="key">Model:</span>      Mid-tier (Haiku · GPT-4o-mini)
+<span class="key">Messages:</span>   Capped per day
+<span class="key">Context:</span>    Smaller window
+<span class="key">Tools:</span>      Limited file upload, no code-run
+<span class="key">Cost:</span>       ₹0</pre>
+        <div class="note">Plenty for this course. Plenty for occasional chart-reading help. You will hit limits when chats get long or you upload many files.</div>
+      </div>
+      <div class="prompt-box good">
+        <div class="label">Paid tier · ~₹1,700–2,000 / month</div>
+<pre><span class="cmt">// when it starts to earn itself</span>
+<span class="key">Model:</span>      Top-tier (Opus · GPT-5)
+<span class="key">Messages:</span>   Much higher caps
+<span class="key">Context:</span>    Full window (200K tokens)
+<span class="key">Tools:</span>      Code interpreter · Projects · Web
+<span class="key">Cost:</span>       ~₹1,700–2,000 / month</pre>
+        <div class="note">Worth it when: long postmortem chats, daily journal CSVs, multi-step analysis, code-run for real math, persistent <b>Projects</b>.</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §xiii</div>
+    <div class="seal">価</div>
+  </div>
+</section>
+
+<!-- ====================================================== 15 / TRIO — three doorways -->
+<section class="slide trio">
+  <div class="runner">
+    <div class="left">REALITY · <span>Three doorways</span></div>
+    <div class="right">Slide <b>15</b> / 17</div>
+  </div>
+  <div class="body">
+    <div>
+      <div class="eyebrow">xiv · Where you'll actually talk to it</div>
+      <h2 class="display" style="margin-top:18px;">Same model. <em>Three doors.</em></h2>
+    </div>
+    <div class="three">
+      <div class="card">
+        <div class="num">i</div>
+        <h4>The <em>Chat</em></h4>
+        <p>claude.ai · chatgpt.com. The browser tab. Where this whole course lives. <b>You will spend 95% of your AI time here.</b></p>
+        <div class="tag">audience · <b>everyone</b></div>
+      </div>
+      <div class="card">
+        <div class="num">ii</div>
+        <h4>The <em>IDE</em></h4>
+        <p>Claude Code · Cursor · Copilot. AI inside the coder's workshop. Great if you ever try to automate or backtest. Not required for this course.</p>
+        <div class="tag">audience · <b>builders</b></div>
+      </div>
+      <div class="card">
+        <div class="num">iii</div>
+        <h4>The <em>API</em></h4>
+        <p>Wiring AI into your own software. The plumbing layer. Useful if you ever build a personal trade journal bot. Not required for this course.</p>
+        <div class="tag">audience · <b>builders only</b></div>
+      </div>
+    </div>
+    <p class="bottom-line" style="text-align:center;max-width:58ch;margin-left:auto;margin-right:auto;">For this Mentorship: <em>the chat is enough.</em> Open the tab, paste the chart, refine the prompt. The other two doors stay closed until you choose to open them.</p>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §xiv</div>
+    <div class="seal">門</div>
+  </div>
+</section>
+
+<!-- ====================================================== 16 / STATEMENT — memory -->
+<section class="slide statement">
+  <div class="runner">
+    <div class="left">REALITY · <span>Memory across chats</span></div>
+    <div class="right">Slide <b>16</b> / 17</div>
+  </div>
+  <div class="body">
+    <div class="roman">xv · A fresh page, every time</div>
+    <h1>Each new chat <em>forgets</em> the last one.</h1>
+    <p class="bottom-line">By default, Claude doesn't remember yesterday's conversation. Every new chat is a new desk, new intern, no notes from before. <em>Projects</em> change this — you give the AI a folder of your trading rules, your journal, your watchlist, and every chat inside that Project starts already aware. <em>One folder. Many fresh conversations.</em> That's how a trader builds an AI that knows them.</p>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics · §xv</div>
+    <div class="seal">新</div>
+  </div>
+</section>
+
+<!-- ====================================================== 17 / NEXT — transition -->
+<section class="slide next">
+  <div class="runner">
+    <div class="left">NEXT · <span>Part B — AI in your TA</span></div>
+    <div class="right">Slide <b>17</b> / 17</div>
+  </div>
+  <div class="body">
+    <div class="left">
+      <div class="eyebrow">Now: apply it</div>
+      <h2>You know the <em>tool</em>. Time to <em>use</em> it.</h2>
+      <p>Fifteen ideas, one principle: <b>AI is a partner who read everything, lived nothing, and has zero money on the line.</b> Now we take that partner to the chart. Morning routine. Pre-trade interview. Postmortem. Bias mirror.</p>
+      <div class="arrow"><span></span>Continue → Part B</div>
+    </div>
+    <div class="card">
+      <div class="tag">Module 02 · Part B</div>
+      <h3>AI <em>in your</em> TA.</h3>
+      <ul>
+        <li><span>i</span>Morning routine prompt — phase &amp; setup in 60 seconds.</li>
+        <li><span>ii</span>Pre-trade interview — Hope / Ego / Sunk-cost / Pain.</li>
+        <li><span>iii</span>Postmortem prompt — what bias killed this trade.</li>
+        <li><span>iv</span>Bias mirror — what your prompt reveals about you.</li>
+        <li><span>v</span>One failure demo — Claude hallucinates a pattern.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="url">/tc/ta-ai/module-02/basics → /module-02</div>
+    <div class="seal">次</div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
